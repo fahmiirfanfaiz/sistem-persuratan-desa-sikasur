@@ -13,6 +13,7 @@ import {
   Phone,
   Mail,
 } from "lucide-react";
+import { FaInstagram, FaYoutube } from "react-icons/fa";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -44,7 +45,7 @@ export default function LandingPage() {
 
   const handleCta = () => {
     if (user) {
-      router.push("/dashboard");
+      router.push("/submission");
     } else {
       router.push("/register");
     }
@@ -66,7 +67,7 @@ export default function LandingPage() {
               priority
             />
             <span className="text-[11px] font-bold text-[#1a2e6f] uppercase leading-tight max-w-[180px]">
-              Sistem Manajemen Persuratan
+              Sistem Persuratan Digital
             </span>
           </Link>
 
@@ -332,8 +333,8 @@ export default function LandingPage() {
                 height={43}
                 className="object-contain"
               />
-              <span className="text-[11px] font-bold text-white uppercase leading-tight max-w-[150px]">
-                Sistem Manajemen Persuratan
+              <span className="text-[11px] font-bold text-white uppercase leading-tight max-w-[200px]">
+                Sistem Persuratan Digital
               </span>
             </Link>
             <div>
@@ -396,30 +397,20 @@ export default function LandingPage() {
             </p>
             <div className="flex items-center gap-4">
               <a
-                href="#"
+                href="https://www.instagram.com/gemercikbelik"
                 aria-label="Instagram"
                 className="text-gray-400 hover:text-white transition"
               >
-                {/* Instagram icon */}
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-                </svg>
+                <FaInstagram size={20} />
               </a>
               <a
-                href="#"
+                href="https://www.youtube.com/@KKNBelikUGM"
                 aria-label="YouTube"
                 className="text-gray-400 hover:text-white transition"
               >
-                {/* YouTube icon */}
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" />
-                  <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" />
-                </svg>
+                <FaYoutube size={20} />
               </a>
             </div>
-
           </div>
         </div>
 
