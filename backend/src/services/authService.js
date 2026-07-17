@@ -14,25 +14,27 @@ const register = async (data) => {
   const { name, nik, familyCardNumber, email, phoneNumber, address, password } =
     data;
 
+  // Required fields
   if (!name) throw new ClientError("Name is required");
-  if (!nik) throw new ClientError("NIK is required");
-  if (!familyCardNumber) throw new ClientError("KK Number is required");
   if (!email) throw new ClientError("Email is required");
   if (!phoneNumber) throw new ClientError("Phone number is required");
   if (!address) throw new ClientError("Address is required");
   if (!password) throw new ClientError("Password is required");
 
-  // --- Uniqueness checks (run in parallel for speed) ---
-  const [existingEmail, existingNIK, existingPhone] = await Promise.all([
+  // --- Uniqueness checks ---
+  const [existingEmail, existingPhone] = await Promise.all([
     prisma.user.findUnique({ where: { email } }),
-    prisma.user.findUnique({ where: { nik } }),
     prisma.user.findUnique({ where: { phoneNumber } }),
   ]);
 
-  if (existingEmail) throw new ClientError("Email already registered", 409);
-  if (existingNIK) throw new ClientError("NIK already registered", 409);
-  if (existingPhone)
-    throw new ClientError("Phone number already registered", 409);
+  if (existingEmail) throw new ClientError("Email sudah terdaftar", 409);
+  if (existingPhone) throw new ClientError("Nomor handphone sudah terdaftar", 409);
+
+  // Optional NIK uniqueness check
+  if (nik) {
+    const existingNIK = await prisma.user.findUnique({ where: { nik } });
+    if (existingNIK) throw new ClientError("NIK sudah terdaftar", 409);
+  }
 
   // --- Hash & Create ---
   const hashedPassword = await bcrypt.hash(password, 12);
@@ -40,8 +42,8 @@ const register = async (data) => {
   const user = await prisma.user.create({
     data: {
       name,
-      nik,
-      familyCardNumber,
+      nik: nik ?? null,
+      familyCardNumber: familyCardNumber ?? null,
       email,
       phoneNumber,
       address,
@@ -51,14 +53,13 @@ const register = async (data) => {
     select: {
       id: true,
       name: true,
-      nik: true,
       email: true,
       role: true,
       createdAt: true,
     },
   });
 
-  return user; // ← was missing, caused controller to return undefined
+  return user;
 };
 
 const login = async (data) => {
@@ -85,7 +86,15 @@ const login = async (data) => {
     }
   );
 
-  return { accessToken };
+  return {
+    accessToken,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    },
+  };
 }
 
 export { ClientError };
