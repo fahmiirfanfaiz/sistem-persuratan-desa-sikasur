@@ -32,4 +32,8 @@ router.get("/", authenticate, submissionController.getMySubmissions);
 // POST /api/submissions — protected
 router.post("/", authenticate, uploadFields, submissionController.create);
 
+// GET /api/submissions/:id/download — get signed URL for processed letter
+router.get("/:id/download", authenticate, submissionController.getGeneratedLetterUrl);
+
 export default router;
+

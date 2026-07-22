@@ -10,4 +10,11 @@ router.get("/me", authenticate, userController.getMe);
 // PUT /api/users/me — update current user profile (protected)
 router.put("/me", authenticate, userController.updateMe);
 
+// GET /api/users/me/notifications — get user notifications
+router.get("/me/notifications", authenticate, userController.getMyNotifications);
+
+// PATCH /api/users/me/notifications/read — mark notifications as read
+router.patch("/me/notifications/read", authenticate, userController.markNotificationsRead);
+
 export default router;
+

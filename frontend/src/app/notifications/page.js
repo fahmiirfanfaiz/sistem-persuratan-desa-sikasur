@@ -14,59 +14,37 @@ import {
   Loader2,
   RotateCcw,
   CheckCheck,
+  Download,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getStoredUser, apiFetch } from "@/lib/api";
 
-// ─── Constants ─────────────────────────────────────────────────────────────────
-const STORAGE_KEY = "spd_read_notifs";
-
-function getReadIds() {
-  try {
-    return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]"));
-  } catch {
-    return new Set();
-  }
-}
-
-function saveReadIds(ids) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify([...ids]));
-}
-
-// ─── Notification config per status ───────────────────────────────────────────
-function getNotifConfig(status) {
-  const map = {
-    PENDING: {
-      icon: Clock,
-      iconClass: "text-amber-500",
-      bgClass: "bg-amber-50",
-      title: "Pengajuan Sedang Menunggu",
-      desc: (name) => `Pengajuan surat "${name}" Anda sedang dalam antrian dan menunggu untuk diproses.`,
-    },
-    PROCESSING: {
-      icon: AlertCircle,
-      iconClass: "text-blue-500",
-      bgClass: "bg-blue-50",
-      title: "Pengajuan Sedang Diproses",
-      desc: (name) => `Pengajuan surat "${name}" Anda sedang diproses oleh petugas.`,
-    },
-    APPROVED: {
+// ─── Notification icon config ──────────────────────────────────────────────────
+function getNotifConfig(header) {
+  if (header?.includes("Selesai") || header?.includes("Disetujui"))
+    return {
       icon: CheckCircle2,
       iconClass: "text-emerald-500",
       bgClass: "bg-emerald-50",
-      title: "Pengajuan Disetujui",
-      desc: (name) => `Selamat! Pengajuan surat "${name}" Anda telah disetujui.`,
-    },
-    REJECTED: {
+    };
+  if (header?.includes("Ditolak"))
+    return {
       icon: XCircle,
       iconClass: "text-red-500",
       bgClass: "bg-red-50",
-      title: "Pengajuan Ditolak",
-      desc: (name) => `Pengajuan surat "${name}" Anda tidak dapat disetujui. Silakan ajukan ulang.`,
-    },
+    };
+  if (header?.includes("Diproses"))
+    return {
+      icon: AlertCircle,
+      iconClass: "text-blue-500",
+      bgClass: "bg-blue-50",
+    };
+  return {
+    icon: Clock,
+    iconClass: "text-amber-500",
+    bgClass: "bg-amber-50",
   };
-  return map[status] ?? map.PENDING;
 }
 
 // ─── Relative time ─────────────────────────────────────────────────────────────
@@ -90,17 +68,18 @@ function relativeTime(isoString) {
 
 // ─── Notification Card ─────────────────────────────────────────────────────────
 function NotifCard({ notif, isRead, onRead }) {
-  const cfg = getNotifConfig(notif.status);
+  const cfg = getNotifConfig(notif.header);
   const Icon = cfg.icon;
+  const isCompleted = notif.header?.includes("Selesai");
 
   return (
     <div
-      className={`relative bg-white rounded-2xl border transition-all duration-200 p-5 cursor-pointer group ${
+      className={`relative bg-white rounded-2xl border transition-all duration-200 p-5 ${
         isRead
           ? "border-gray-100 shadow-sm"
-          : "border-[#1a2e6f]/20 shadow-md ring-1 ring-[#1a2e6f]/10"
+          : "border-[#1a2e6f]/20 shadow-md ring-1 ring-[#1a2e6f]/10 cursor-pointer"
       }`}
-      onClick={() => onRead(notif.id)}
+      onClick={() => !isRead && onRead(notif.id)}
     >
       {/* Unread dot */}
       {!isRead && (
@@ -117,18 +96,13 @@ function NotifCard({ notif, isRead, onRead }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
             <p className={`text-sm font-semibold ${isRead ? "text-gray-700" : "text-gray-900"}`}>
-              {cfg.title}
+              {notif.header}
             </p>
             <span className="text-[11px] text-gray-400 flex-shrink-0 mt-0.5">
-              {relativeTime(notif.updatedAt ?? notif.createdAt)}
+              {relativeTime(notif.createdAt)}
             </span>
           </div>
-          <p className="text-xs text-gray-500 leading-relaxed">
-            {cfg.desc(notif.letterType?.name ?? "Surat Keterangan")}
-          </p>
-          <p className="text-[11px] text-gray-400 mt-1.5">
-            Keperluan: <span className="text-gray-500">{notif.purpose}</span>
-          </p>
+          <p className="text-xs text-gray-500 leading-relaxed">{notif.body}</p>
         </div>
       </div>
     </div>
@@ -153,7 +127,7 @@ function EmptyState() {
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 export default function NotificationsPage() {
   const router = useRouter();
-  const [submissions, setSubmissions] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [readIds, setReadIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -165,14 +139,17 @@ export default function NotificationsPage() {
       return;
     }
 
-    setReadIds(getReadIds());
-
     const fetchData = async () => {
       try {
-        const res = await apiFetch("/api/submissions");
+        const res = await apiFetch("/api/users/me/notifications");
         if (!res.ok) throw new Error("Gagal memuat notifikasi");
         const json = await res.json();
-        setSubmissions(json.data ?? []);
+        const notifs = json.data ?? [];
+        setNotifications(notifs);
+
+        // Pre-populate readIds from backend isRead flag
+        const alreadyRead = new Set(notifs.filter((n) => n.isRead).map((n) => n.id));
+        setReadIds(alreadyRead);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -183,22 +160,39 @@ export default function NotificationsPage() {
     fetchData();
   }, [router]);
 
-  const handleRead = useCallback((id) => {
+  const handleRead = useCallback(async (id) => {
     setReadIds((prev) => {
       const next = new Set(prev);
       next.add(id);
-      saveReadIds(next);
       return next;
     });
+    // Mark as read in backend
+    try {
+      await apiFetch("/api/users/me/notifications/read", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: [id] }),
+      });
+    } catch {
+      // fail silently
+    }
   }, []);
 
-  const handleMarkAllRead = () => {
-    const all = new Set(submissions.map((s) => s.id));
+  const handleMarkAllRead = async () => {
+    const all = new Set(notifications.map((n) => n.id));
     setReadIds(all);
-    saveReadIds(all);
+    try {
+      await apiFetch("/api/users/me/notifications/read", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: [...all] }),
+      });
+    } catch {
+      // fail silently
+    }
   };
 
-  const unreadCount = submissions.filter((s) => !readIds.has(s.id)).length;
+  const unreadCount = notifications.filter((n) => !readIds.has(n.id)).length;
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f8f9fc]">
@@ -212,10 +206,7 @@ export default function NotificationsPage() {
             <ChevronRight size={12} />
             <span className="text-gray-600">Notifikasi</span>
           </div>
-          <Link
-            href="/"
-            className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-[#1a2e6f] transition"
-          >
+          <Link href="/" className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-[#1a2e6f] transition">
             <ArrowLeft size={16} />
             Kembali ke Beranda
           </Link>
@@ -233,12 +224,10 @@ export default function NotificationsPage() {
                 </span>
               )}
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Status terbaru pengajuan surat Anda
-            </p>
+            <p className="text-sm text-gray-500 mt-1">Status terbaru pengajuan surat Anda</p>
           </div>
 
-          {!loading && submissions.length > 0 && unreadCount > 0 && (
+          {!loading && notifications.length > 0 && unreadCount > 0 && (
             <button
               onClick={handleMarkAllRead}
               className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-[#1a2e6f] border border-[#1a2e6f]/30 rounded-xl hover:bg-[#1a2e6f]/5 transition"
@@ -266,44 +255,34 @@ export default function NotificationsPage() {
               Coba Lagi
             </button>
           </div>
-        ) : submissions.length === 0 ? (
+        ) : notifications.length === 0 ? (
           <EmptyState />
         ) : (
           <div className="flex flex-col gap-3 max-w-2xl">
-            {/* Unread section */}
+            {/* Unread */}
             {unreadCount > 0 && (
               <>
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">
                   Belum Dibaca
                 </p>
-                {submissions
-                  .filter((s) => !readIds.has(s.id))
-                  .map((s) => (
-                    <NotifCard
-                      key={s.id}
-                      notif={s}
-                      isRead={false}
-                      onRead={handleRead}
-                    />
+                {notifications
+                  .filter((n) => !readIds.has(n.id))
+                  .map((n) => (
+                    <NotifCard key={n.id} notif={n} isRead={false} onRead={handleRead} />
                   ))}
               </>
             )}
 
-            {/* Read section */}
-            {submissions.some((s) => readIds.has(s.id)) && (
+            {/* Read */}
+            {notifications.some((n) => readIds.has(n.id)) && (
               <>
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mt-2">
                   Sudah Dibaca
                 </p>
-                {submissions
-                  .filter((s) => readIds.has(s.id))
-                  .map((s) => (
-                    <NotifCard
-                      key={s.id}
-                      notif={s}
-                      isRead={true}
-                      onRead={handleRead}
-                    />
+                {notifications
+                  .filter((n) => readIds.has(n.id))
+                  .map((n) => (
+                    <NotifCard key={n.id} notif={n} isRead={true} onRead={handleRead} />
                   ))}
               </>
             )}

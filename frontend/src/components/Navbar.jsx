@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { ChevronDown, User, LogOut, Bell, History } from "lucide-react";
+import { ChevronDown, User, LogOut, Bell, History, LayoutDashboard } from "lucide-react";
 import { getStoredUser, clearAuth } from "@/lib/api";
 import LogoutModal from "./LogoutModal";
 
@@ -23,7 +23,7 @@ export default function Navbar() {
 
   useEffect(() => {
     setUser(getStoredUser());
-  }, []);
+  }, [pathname]); // re-read on navigation to pick up auth changes
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -38,9 +38,11 @@ export default function Navbar() {
 
   const handleLogoutConfirm = () => {
     clearAuth();
+    setUser(null);
     setLogoutModalOpen(false);
     setDropdownOpen(false);
     router.push("/");
+    router.refresh();
   };
 
   const isActive = (href) => pathname === href;
@@ -67,6 +69,23 @@ export default function Navbar() {
           {/* Right — icons + Profile Dropdown */}
           {user ? (
             <div className="flex items-center gap-1">
+              {/* Admin Dashboard Button — only for ADMIN role */}
+              {user.role === "ADMIN" && (
+                <Link
+                  href="/admin"
+                  id="navbar-admin-btn"
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition ${
+                    pathname.startsWith("/admin")
+                      ? "bg-[#1a2e6f] text-white"
+                      : "bg-[#1a2e6f]/10 text-[#1a2e6f] hover:bg-[#1a2e6f] hover:text-white"
+                  }`}
+                  title="Admin Dashboard"
+                >
+                  <LayoutDashboard size={15} />
+                  <span className="hidden sm:inline">Admin</span>
+                </Link>
+              )}
+
               {/* Notification Bell */}
               <Link
                 href="/notifications"
