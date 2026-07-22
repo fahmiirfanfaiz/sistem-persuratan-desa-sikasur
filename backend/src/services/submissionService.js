@@ -102,5 +102,26 @@ const createSubmission = async (userId, data, files) => {
   return submission;
 };
 
+/**
+ * Retrieves all submissions belonging to a user.
+ * @param {string} userId
+ */
+const getSubmissionsByUser = async (userId) => {
+  return prisma.submission.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      status: true,
+      purpose: true,
+      createdAt: true,
+      updatedAt: true,
+      letterType: {
+        select: { id: true, name: true },
+      },
+    },
+  });
+};
+
 export { ClientError };
-export default { createSubmission };
+export default { createSubmission, getSubmissionsByUser };

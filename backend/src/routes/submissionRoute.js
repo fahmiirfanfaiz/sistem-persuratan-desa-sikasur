@@ -26,6 +26,9 @@ const uploadFields = upload.fields([
   { name: "ktpFile", maxCount: 1 },
 ]);
 
+// GET /api/submissions — list current user's submissions (protected)
+router.get("/", authenticate, submissionController.getMySubmissions);
+
 // POST /api/submissions — protected
 router.post("/", authenticate, uploadFields, submissionController.create);
 

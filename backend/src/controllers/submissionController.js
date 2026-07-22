@@ -43,4 +43,15 @@ const create = async (req, res) => {
   }
 };
 
-export default { create };
+const getMySubmissions = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const submissions = await submissionService.getSubmissionsByUser(userId);
+    return res.status(200).json({ success: true, data: submissions });
+  } catch (error) {
+    console.error("[getMySubmissions]", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+export default { create, getMySubmissions };

@@ -3,17 +3,19 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { ChevronDown, User, LogOut } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { ChevronDown, User, LogOut, Bell, History } from "lucide-react";
 import { getStoredUser, clearAuth } from "@/lib/api";
 import LogoutModal from "./LogoutModal";
 
 /**
  * Shared Navbar component for authenticated pages.
- * Sesuai desain Figma node 70-555 (Profile Dropdown)
+ * Profile Dropdown sesuai desain Figma node 383-960
+ * Dilengkapi ikon Riwayat (History) dan Notifikasi (Bell)
  */
 export default function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
@@ -41,6 +43,8 @@ export default function Navbar() {
     router.push("/");
   };
 
+  const isActive = (href) => pathname === href;
+
   return (
     <>
       <header className="sticky top-0 z-40 w-full bg-white border-b border-gray-100 shadow-sm">
@@ -60,67 +64,103 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {/* Right — Profile Dropdown */}
+          {/* Right — icons + Profile Dropdown */}
           {user ? (
-            <div className="relative" ref={dropdownRef}>
-              <button
-                id="navbar-profile-btn"
-                onClick={() => setDropdownOpen((v) => !v)}
-                className="flex items-center gap-2 rounded-full px-3 py-1.5 hover:bg-gray-50 transition"
-                aria-expanded={dropdownOpen}
-                aria-haspopup="true"
+            <div className="flex items-center gap-1">
+              {/* Notification Bell */}
+              <Link
+                href="/notifications"
+                id="navbar-notifications-btn"
+                className={`relative p-2.5 rounded-xl transition ${
+                  isActive("/notifications")
+                    ? "bg-[#1a2e6f]/10 text-[#1a2e6f]"
+                    : "text-gray-500 hover:bg-gray-100 hover:text-[#1a2e6f]"
+                }`}
+                aria-label="Notifikasi"
+                title="Notifikasi"
               >
-                {/* Avatar — initial-based */}
-                <div className="w-8 h-8 rounded-full bg-[#1a2e6f] text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
-                  {user.name?.charAt(0)?.toUpperCase() ?? "U"}
-                </div>
-                <span className="text-sm font-medium text-gray-700 max-w-[130px] truncate">
-                  {user.name}
-                </span>
-                <ChevronDown
-                  size={14}
-                  className={`text-gray-400 transition-transform duration-200 ${
-                    dropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
+                <Bell size={20} strokeWidth={1.75} />
+              </Link>
 
-              {/* Dropdown Menu — Figma node 70-555 */}
-              {dropdownOpen && (
-                <div className="absolute right-0 top-full mt-2 w-[220px] rounded-xl bg-white shadow-lg border border-gray-100 py-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
-                  {/* User info */}
-                  <div className="px-4 pt-1 pb-3 border-b border-gray-100">
-                    <p className="text-sm font-semibold text-gray-900 truncate">
-                      {user.name}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate mt-0.5">
-                      {user.email}
-                    </p>
-                  </div>
+              {/* Riwayat Pengajuan */}
+              <Link
+                href="/history"
+                id="navbar-history-btn"
+                className={`p-2.5 rounded-xl transition ${
+                  isActive("/history")
+                    ? "bg-[#1a2e6f]/10 text-[#1a2e6f]"
+                    : "text-gray-500 hover:bg-gray-100 hover:text-[#1a2e6f]"
+                }`}
+                aria-label="Riwayat Pengajuan"
+                title="Riwayat Pengajuan"
+              >
+                <History size={20} strokeWidth={1.75} />
+              </Link>
 
-                  {/* Menu items */}
-                  <div className="pt-1">
-                    <Link
-                      href="/profile"
-                      className="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-                      onClick={() => setDropdownOpen(false)}
-                    >
-                      <span>Pengaturan Profile</span>
-                      <User size={16} className="text-gray-400" />
-                    </Link>
-                    <button
-                      onClick={() => {
-                        setDropdownOpen(false);
-                        setLogoutModalOpen(true);
-                      }}
-                      className="w-full flex items-center justify-between px-4 py-2.5 text-sm text-[#e53e3e] hover:bg-red-50 transition"
-                    >
-                      <span>Keluar</span>
-                      <LogOut size={16} />
-                    </button>
+              {/* Divider */}
+              <div className="w-px h-6 bg-gray-200 mx-1" />
+
+              {/* Profile Dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  id="navbar-profile-btn"
+                  onClick={() => setDropdownOpen((v) => !v)}
+                  className="flex items-center gap-2 rounded-xl px-2.5 py-1.5 hover:bg-gray-100 transition"
+                  aria-expanded={dropdownOpen}
+                  aria-haspopup="true"
+                >
+                  {/* Avatar — initial-based */}
+                  <div className="w-8 h-8 rounded-full bg-[#1a2e6f] text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+                    {user.name?.charAt(0)?.toUpperCase() ?? "U"}
                   </div>
-                </div>
-              )}
+                  <span className="text-sm font-medium text-gray-700 max-w-[120px] truncate hidden sm:block">
+                    {user.name}
+                  </span>
+                  <ChevronDown
+                    size={14}
+                    className={`text-gray-400 transition-transform duration-200 ${
+                      dropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {/* Dropdown Menu — Figma 383-960 */}
+                {dropdownOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-[220px] rounded-2xl bg-white shadow-xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                    {/* User info header */}
+                    <div className="px-4 pt-4 pb-3 border-b border-gray-100">
+                      <p className="text-sm font-semibold text-gray-900 truncate leading-tight">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-gray-400 truncate mt-0.5">
+                        {user.email}
+                      </p>
+                    </div>
+
+                    {/* Menu items */}
+                    <div className="py-1">
+                      <Link
+                        href="/profile"
+                        className="flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        <span>Profil Pengguna</span>
+                        <User size={16} className="text-gray-400 flex-shrink-0" />
+                      </Link>
+                      <button
+                        onClick={() => {
+                          setDropdownOpen(false);
+                          setLogoutModalOpen(true);
+                        }}
+                        className="w-full flex items-center justify-between px-4 py-3 text-sm text-[#e53e3e] hover:bg-red-50 transition"
+                      >
+                        <span>Keluar</span>
+                        <LogOut size={16} className="flex-shrink-0" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             <div className="flex items-center gap-2">

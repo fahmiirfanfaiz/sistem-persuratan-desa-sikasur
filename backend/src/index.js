@@ -4,6 +4,7 @@ import cors from "cors";
 import authRoute from "./routes/authRoute.js";
 import letterRoute from "./routes/letterRoute.js";
 import submissionRoute from "./routes/submissionRoute.js";
+import userRoute from "./routes/userRoute.js";
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -22,7 +23,9 @@ app.use(express.json());
 app.use("/api/auth", authRoute);
 app.use("/api/letters", letterRoute);
 app.use("/api/submissions", submissionRoute);
+app.use("/api/users", userRoute);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
-})
+})
+

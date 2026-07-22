@@ -4,21 +4,13 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import {
-  ArrowRight,
-  ChevronDown,
-  LogOut,
-  Play,
-  MapPin,
-  Phone,
-  Mail,
-} from "lucide-react";
+import { ArrowRight, Play, MapPin, Phone, Mail } from "lucide-react";
 import { FaInstagram, FaYoutube } from "react-icons/fa";
+import Navbar from "@/components/Navbar";
 
 export default function LandingPage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     // Read auth state from localStorage (client-side only)
@@ -28,20 +20,11 @@ export default function LandingPage() {
       try {
         setUser(JSON.parse(storedUser));
       } catch {
-        // Invalid stored data, clear it
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
       }
     }
   }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("user");
-    setUser(null);
-    setDropdownOpen(false);
-    router.refresh();
-  };
 
   const handleCta = () => {
     if (user) {
@@ -53,81 +36,8 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-white">
-      {/* ── Navbar ──────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-100 shadow-sm">
-        <div className="max-w-[1140px] mx-auto px-6 h-[72px] flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 flex-shrink-0">
-            <Image
-              src="/images/logo-pemalang.svg"
-              alt="Logo Pemalang"
-              width={32}
-              height={43}
-              className="object-contain"
-              priority
-            />
-            <span className="text-[11px] font-bold text-[#1a2e6f] uppercase leading-tight max-w-[180px]">
-              Sistem Persuratan Digital
-            </span>
-          </Link>
-
-          {/* Right side */}
-          {user ? (
-            /* Authenticated: user avatar + name */
-            <div className="relative">
-              <button
-                onClick={() => setDropdownOpen((v) => !v)}
-                className="flex items-center gap-2 rounded-full px-3 py-1.5 hover:bg-gray-50 transition"
-              >
-                <div className="w-8 h-8 rounded-full bg-[#1a2e6f] text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
-                  {user.name?.charAt(0)?.toUpperCase() ?? "U"}
-                </div>
-                <span className="text-sm font-medium text-gray-700 max-w-[120px] truncate">
-                  {user.name}
-                </span>
-                <ChevronDown
-                  size={14}
-                  className={`text-gray-400 transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
-                />
-              </button>
-              {dropdownOpen && (
-                <div className="absolute right-0 top-full mt-1 w-48 rounded-xl bg-white shadow-lg border border-gray-100 py-1 z-50">
-                  <Link
-                    href="/dashboard"
-                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition"
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    Dashboard
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition"
-                  >
-                    <LogOut size={14} />
-                    Keluar
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            /* Unauthenticated: Masuk + Daftar */
-            <div className="flex items-center gap-2">
-              <Link
-                href="/login"
-                className="px-5 py-2 text-sm font-semibold text-[#1a2e6f] border border-[#1a2e6f] rounded-lg hover:bg-[#1a2e6f]/5 transition"
-              >
-                Masuk
-              </Link>
-              <Link
-                href="/register"
-                className="px-5 py-2 text-sm font-semibold text-white bg-[#1a2e6f] rounded-lg hover:bg-[#152460] transition"
-              >
-                Daftar
-              </Link>
-            </div>
-          )}
-        </div>
-      </header>
+      {/* ── Shared Navbar (includes Bell, History, Profile Dropdown) ── */}
+      <Navbar />
 
       <main className="flex-1">
         {/* ── Hero Section ─────────────────────────────── */}
