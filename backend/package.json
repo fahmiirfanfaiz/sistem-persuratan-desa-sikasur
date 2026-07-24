@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node --import tsx/esm src/index.js",
     "dev": "nodemon --exec \"node --import tsx/esm\" src/index.js",
-    "generate": "prisma generate"
+    "generate": "prisma generate",
+    "postinstall": "prisma generate",
+    "build": "prisma generate"
   },
   "keywords": [],
   "author": "",

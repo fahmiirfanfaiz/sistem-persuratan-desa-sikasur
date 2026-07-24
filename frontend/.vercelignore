@@ -1,0 +1,31 @@
+# ── Vercel Ignore — Frontend ─────────────────────────────────────────────────
+# Files/dirs listed here are NOT uploaded to Vercel during deployment.
+
+# Dependencies (installed fresh by Vercel)
+node_modules/
+
+# Local environment secrets — NEVER deploy these
+.env
+.env.*
+!.env.example
+
+# Next.js build cache (Vercel has its own build cache)
+.next/
+
+# Development tooling
+*.log
+.eslintcache
+
+# Git internals
+.git/
+.github/
+
+# Editor & OS artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Docs (not needed at runtime)
+README.md
+AGENTS.md
+CLAUDE.md

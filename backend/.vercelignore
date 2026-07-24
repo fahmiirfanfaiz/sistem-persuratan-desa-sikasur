@@ -1,0 +1,26 @@
+# ── Vercel Ignore — Backend ─────────────────────────────────────────────────
+# Files/dirs listed here are NOT uploaded to Vercel during deployment.
+# Smaller upload = faster builds.
+
+# Dependencies (installed fresh by Vercel)
+node_modules/
+
+# Local environment secrets — NEVER deploy these
+.env
+.env.*
+!.env.example
+
+# Prisma generated client (re-generated during build via postinstall)
+src/generated/
+
+# Development-only tools
+nodemon.json
+*.log
+
+# Git internals
+.git/
+.github/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
