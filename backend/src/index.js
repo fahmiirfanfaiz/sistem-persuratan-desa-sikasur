@@ -18,6 +18,7 @@ const defaultOrigins = [
   "http://127.0.0.1:3000",
   "http://localhost:3001",
   "http://127.0.0.1:3001",
+  "https://persuratan-sikasur.vercel.app",
 ];
 
 const extraOrigins = process.env.ALLOWED_ORIGINS
