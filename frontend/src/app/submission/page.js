@@ -94,7 +94,7 @@ function FileUploadZone({ label, file, onFileChange, onRemove, id }) {
             Klik Untuk Mengunggah Atau Seret Dan Lepas
           </p>
           <p className="text-xs text-gray-400">
-            Format: Image (Maksimal 10 MB)
+            Format: Image (Maksimal 2 MB)
           </p>
           <input
             ref={inputRef}
@@ -286,7 +286,7 @@ export default function SubmissionPage() {
   };
 
   const handleFileValidation = (file, fieldName) => {
-    const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+    const MAX_SIZE = 2 * 1024 * 1024; // 2MB
     if (!file.type.startsWith("image/")) {
       setFormError(
         `File ${fieldName} harus berformat gambar (JPEG/PNG/WEBP)`
@@ -294,7 +294,7 @@ export default function SubmissionPage() {
       return false;
     }
     if (file.size > MAX_SIZE) {
-      setFormError(`File ${fieldName} tidak boleh lebih dari 10 MB`);
+      setFormError(`File ${fieldName} tidak boleh lebih dari 2 MB`);
       return false;
     }
     setFormError("");
