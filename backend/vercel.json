@@ -4,8 +4,7 @@
   "buildCommand": "npm run build",
   "functions": {
     "api/index.js": {
-      "maxDuration": 30,
-      "includeFiles": "src/generated/**"
+      "maxDuration": 30
     }
   },
   "rewrites": [
