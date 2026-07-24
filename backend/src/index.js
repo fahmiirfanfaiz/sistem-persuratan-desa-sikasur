@@ -5,6 +5,7 @@ import authRoute from "./routes/authRoute.js";
 import letterRoute from "./routes/letterRoute.js";
 import submissionRoute from "./routes/submissionRoute.js";
 import userRoute from "./routes/userRoute.js";
+import adminRoute from "./routes/adminRoute.js";
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -24,8 +25,10 @@ app.use("/api/auth", authRoute);
 app.use("/api/letters", letterRoute);
 app.use("/api/submissions", submissionRoute);
 app.use("/api/users", userRoute);
+app.use("/api/admin", adminRoute);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 })
+
 

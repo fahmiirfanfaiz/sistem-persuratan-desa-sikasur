@@ -29,7 +29,14 @@ const uploadFields = upload.fields([
 // GET /api/submissions — list current user's submissions (protected)
 router.get("/", authenticate, submissionController.getMySubmissions);
 
+// GET /api/submissions/:id — get single submission detail for current user (protected)
+router.get("/:id", authenticate, submissionController.getMySubmissionDetail);
+
 // POST /api/submissions — protected
 router.post("/", authenticate, uploadFields, submissionController.create);
 
+// GET /api/submissions/:id/download — get signed URL for processed letter
+router.get("/:id/download", authenticate, submissionController.getGeneratedLetterUrl);
+
 export default router;
+

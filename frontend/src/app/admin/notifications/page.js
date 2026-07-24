@@ -2,22 +2,16 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import {
   Bell,
   Clock,
   CheckCircle2,
   XCircle,
   AlertCircle,
-  ChevronRight,
-  ArrowLeft,
   Loader2,
   RotateCcw,
   CheckCheck,
-  Download,
 } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { getStoredUser, apiFetch } from "@/lib/api";
 
 // ─── Notification icon config ──────────────────────────────────────────────────
@@ -34,7 +28,7 @@ function getNotifConfig(header) {
       iconClass: "text-red-500",
       bgClass: "bg-red-50",
     };
-  if (header?.includes("Diproses"))
+  if (header?.includes("Baru") || header?.includes("Diproses"))
     return {
       icon: AlertCircle,
       iconClass: "text-blue-500",
@@ -70,7 +64,6 @@ function relativeTime(isoString) {
 function NotifCard({ notif, isRead, onRead }) {
   const cfg = getNotifConfig(notif.header);
   const Icon = cfg.icon;
-  const isCompleted = notif.header?.includes("Selesai");
 
   return (
     <div
@@ -118,14 +111,14 @@ function EmptyState() {
       </div>
       <h3 className="text-base font-semibold text-gray-700 mb-2">Tidak ada notifikasi</h3>
       <p className="text-sm text-gray-400 max-w-xs">
-        Semua notifikasi pengajuan surat Anda akan muncul di sini.
+        Semua notifikasi dari sistem akan muncul di sini.
       </p>
     </div>
   );
 }
 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
-export default function NotificationsPage() {
+export default function AdminNotificationsPage() {
   const router = useRouter();
   const [notifications, setNotifications] = useState([]);
   const [readIds, setReadIds] = useState(new Set());
@@ -134,7 +127,7 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     const user = getStoredUser();
-    if (!user) {
+    if (!user || user.role !== "ADMIN") {
       router.push("/login");
       return;
     }
@@ -195,102 +188,83 @@ export default function NotificationsPage() {
   const unreadCount = notifications.filter((n) => !readIds.has(n.id)).length;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f8f9fc]">
-      <Navbar />
-
-      <main className="flex-1 max-w-[1140px] mx-auto w-full px-6 py-10">
-        {/* Breadcrumb + Back button */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2 text-xs text-gray-400">
-            <Link href="/" className="hover:text-[#1a2e6f] transition">Beranda</Link>
-            <ChevronRight size={12} />
-            <span className="text-gray-600">Notifikasi</span>
-          </div>
-          <Link href="/" className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-[#1a2e6f] transition">
-            <ArrowLeft size={16} />
-            Kembali ke Beranda
-          </Link>
+    <div className="max-w-3xl">
+      {/* Page Header */}
+      <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <Bell size={24} className="text-[#1a2e6f]" />
+            Notifikasi
+            {unreadCount > 0 && (
+              <span className="ml-1 px-2 py-0.5 text-xs font-bold text-white bg-[#1a2e6f] rounded-full">
+                {unreadCount}
+              </span>
+            )}
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">Status dan pembaruan sistem terbaru.</p>
         </div>
 
-        {/* Page Header */}
-        <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Bell size={24} className="text-[#1a2e6f]" />
-              Notifikasi
-              {unreadCount > 0 && (
-                <span className="ml-1 px-2 py-0.5 text-xs font-bold text-white bg-[#1a2e6f] rounded-full">
-                  {unreadCount}
-                </span>
-              )}
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">Status terbaru pengajuan surat Anda</p>
-          </div>
+        {!loading && notifications.length > 0 && unreadCount > 0 && (
+          <button
+            onClick={handleMarkAllRead}
+            className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-[#1a2e6f] border border-[#1a2e6f]/30 rounded-xl hover:bg-[#1a2e6f]/5 transition"
+          >
+            <CheckCheck size={14} />
+            Tandai semua dibaca
+          </button>
+        )}
+      </div>
 
-          {!loading && notifications.length > 0 && unreadCount > 0 && (
-            <button
-              onClick={handleMarkAllRead}
-              className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-[#1a2e6f] border border-[#1a2e6f]/30 rounded-xl hover:bg-[#1a2e6f]/5 transition"
-            >
-              <CheckCheck size={14} />
-              Tandai semua dibaca
-            </button>
+      {/* Content */}
+      {loading ? (
+        <div className="flex justify-center items-center py-24">
+          <Loader2 size={32} className="animate-spin text-[#1a2e6f]" />
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center py-20 text-center">
+          <AlertCircle size={40} className="text-red-400 mb-3" />
+          <p className="text-sm text-gray-500 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-[#1a2e6f] border border-[#1a2e6f] rounded-xl hover:bg-[#1a2e6f]/5 transition"
+          >
+            <RotateCcw size={14} />
+            Coba Lagi
+          </button>
+        </div>
+      ) : notifications.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <div className="flex flex-col gap-3">
+          {/* Unread */}
+          {unreadCount > 0 && (
+            <>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">
+                Belum Dibaca
+              </p>
+              {notifications
+                .filter((n) => !readIds.has(n.id))
+                .map((n) => (
+                  <NotifCard key={n.id} notif={n} isRead={false} onRead={handleRead} />
+                ))}
+            </>
+          )}
+
+          {/* Read */}
+          {notifications.some((n) => readIds.has(n.id)) && (
+            <>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mt-2">
+                Sudah Dibaca
+              </p>
+              {notifications
+                .filter((n) => readIds.has(n.id))
+                .map((n) => (
+                  <NotifCard key={n.id} notif={n} isRead={true} onRead={handleRead} />
+                ))}
+            </>
           )}
         </div>
-
-        {/* Content */}
-        {loading ? (
-          <div className="flex justify-center items-center py-24">
-            <Loader2 size={32} className="animate-spin text-[#1a2e6f]" />
-          </div>
-        ) : error ? (
-          <div className="flex flex-col items-center py-20 text-center">
-            <AlertCircle size={40} className="text-red-400 mb-3" />
-            <p className="text-sm text-gray-500 mb-4">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-[#1a2e6f] border border-[#1a2e6f] rounded-xl hover:bg-[#1a2e6f]/5 transition"
-            >
-              <RotateCcw size={14} />
-              Coba Lagi
-            </button>
-          </div>
-        ) : notifications.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <div className="flex flex-col gap-3 max-w-2xl">
-            {/* Unread */}
-            {unreadCount > 0 && (
-              <>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">
-                  Belum Dibaca
-                </p>
-                {notifications
-                  .filter((n) => !readIds.has(n.id))
-                  .map((n) => (
-                    <NotifCard key={n.id} notif={n} isRead={false} onRead={handleRead} />
-                  ))}
-              </>
-            )}
-
-            {/* Read */}
-            {notifications.some((n) => readIds.has(n.id)) && (
-              <>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mt-2">
-                  Sudah Dibaca
-                </p>
-                {notifications
-                  .filter((n) => readIds.has(n.id))
-                  .map((n) => (
-                    <NotifCard key={n.id} notif={n} isRead={true} onRead={handleRead} />
-                  ))}
-              </>
-            )}
-          </div>
-        )}
-      </main>
-
-      <Footer />
+      )}
     </div>
   );
 }
