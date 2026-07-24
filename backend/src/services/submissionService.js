@@ -91,6 +91,23 @@ const createSubmission = async (userId, data, files) => {
     },
   });
 
+  // Notify admins
+  const adminUsers = await prisma.user.findMany({
+    where: { role: "ADMIN", isActive: true },
+    select: { id: true },
+  });
+  
+  if (adminUsers.length > 0) {
+    const adminNotifs = adminUsers.map((admin) => ({
+      userId: admin.id,
+      header: "Pengajuan Surat Baru",
+      body: `Terdapat pengajuan surat "${letterType.name}" baru yang perlu ditinjau.`,
+    }));
+    await prisma.notification.createMany({
+      data: adminNotifs,
+    });
+  }
+
   return submission;
 };
 
@@ -241,10 +258,23 @@ const getSubmissionByIdForAdmin = async (submissionId) => {
 const getDocumentSignedUrl = async (submissionId, documentId) => {
   const doc = await prisma.document.findFirst({
     where: { id: documentId, submissionId },
+    include: {
+      submission: {
+        include: {
+          user: {
+            select: { name: true }
+          }
+        }
+      }
+    }
   });
   if (!doc) throw new ClientError("Dokumen tidak ditemukan", 404);
 
-  const url = await getSignedDownloadUrl(doc.storagePath, BUCKET_NAME, 300);
+  const prefix = doc.documentType === "KARTU_KELUARGA" ? "KK" : "KTP";
+  const userName = doc.submission?.user?.name || "Pengguna";
+  const downloadName = `${prefix}_${userName}.jpg`;
+
+  const url = await getSignedDownloadUrl(doc.storagePath, BUCKET_NAME, 300, true, downloadName);
   return url;
 };
 
@@ -260,10 +290,14 @@ const getTemplateSignedUrl = async (letterTypeId) => {
   if (!letterType.templatePath)
     throw new ClientError("Template surat tidak tersedia", 404);
 
+  const downloadName = `${letterType.name}.docx`;
+
   const url = await getSignedDownloadUrl(
     `${TEMPLATE_FOLDER}/${letterType.templatePath}`,
     BUCKET_NAME,
-    300
+    300,
+    true,
+    downloadName
   );
   return { url, name: letterType.name };
 };
@@ -418,6 +452,19 @@ const getGeneratedLetterUrl = async (submissionId, userId) => {
   return url;
 };
 
+/**
+ * Delete a submission (admin).
+ */
+const deleteSubmission = async (submissionId) => {
+  const submission = await prisma.submission.findUnique({
+    where: { id: submissionId },
+  });
+  if (!submission) throw new ClientError("Pengajuan tidak ditemukan", 404);
+
+  await prisma.submission.delete({ where: { id: submissionId } });
+  return { id: submissionId };
+};
+
 export { ClientError };
 export default {
   createSubmission,
@@ -430,4 +477,5 @@ export default {
   updateSubmissionStatus,
   getMonthlyStats,
   getGeneratedLetterUrl,
+  deleteSubmission,
 };

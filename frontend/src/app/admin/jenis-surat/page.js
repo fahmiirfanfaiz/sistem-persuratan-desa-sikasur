@@ -2,123 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
-import { Plus, Pencil, Trash2, X, Loader2, AlertCircle } from "lucide-react";
+import Link from "next/link";
+import { Plus, Pencil, Trash2, Loader2, AlertCircle, Eye } from "lucide-react";
 
 // ─── Modals ────────────────────────────────────────────────────────────────────
-function LetterTypeModal({ isOpen, onClose, onSave, categories, editData }) {
-  const isEdit = !!editData;
-  const [form, setForm] = useState({
-    letterCategoryId: "",
-    name: "",
-    description: "",
-    templatePath: "",
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (isOpen) {
-      if (editData) {
-        setForm({
-          letterCategoryId: editData.letterCategoryId ?? "",
-          name: editData.name ?? "",
-          description: editData.description ?? "",
-          templatePath: editData.templatePath ?? "",
-        });
-      } else {
-        setForm({ letterCategoryId: categories[0]?.id ?? "", name: "", description: "", templatePath: "" });
-      }
-      setError("");
-    }
-  }, [isOpen, editData, categories]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.name.trim()) { setError("Nama surat wajib diisi"); return; }
-    setLoading(true);
-    setError("");
-    try {
-      const path = isEdit
-        ? `/api/admin/letter-types/${editData.id}`
-        : `/api/admin/letter-types`;
-      const method = isEdit ? "PUT" : "POST";
-      const res = await apiFetch(path, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      const json = await res.json();
-      if (!res.ok) { setError(json.message || "Terjadi kesalahan"); return; }
-      onSave();
-    } catch {
-      setError("Gagal terhubung ke server");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-bold text-gray-900">{isEdit ? "Edit Jenis Surat" : "Tambah Jenis Surat"}</h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition"><X size={16} /></button>
-        </div>
-        {error && <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">{error}</div>}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1.5">Kategori Surat</label>
-            <select
-              value={form.letterCategoryId}
-              onChange={(e) => setForm((p) => ({ ...p, letterCategoryId: e.target.value }))}
-              className="w-full h-10 px-3 rounded-lg border border-gray-300 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f]"
-            >
-              {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1.5">Nama Surat</label>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-              placeholder="Contoh: Surat Keterangan Usaha"
-              className="w-full h-10 px-3 rounded-lg border border-gray-300 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f]"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1.5">Deskripsi <span className="text-gray-400">(opsional)</span></label>
-            <input
-              type="text"
-              value={form.description}
-              onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))}
-              placeholder="Deskripsi singkat"
-              className="w-full h-10 px-3 rounded-lg border border-gray-300 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f]"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1.5">Nama File Template <span className="text-gray-400">(e.g. Surat Keterangan Usaha.docx)</span></label>
-            <input
-              type="text"
-              value={form.templatePath}
-              onChange={(e) => setForm((p) => ({ ...p, templatePath: e.target.value }))}
-              placeholder="Nama file di bucket letter-template"
-              className="w-full h-10 px-3 rounded-lg border border-gray-300 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f]"
-            />
-          </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={onClose} className="px-5 py-2 text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Batal</button>
-            <button type="submit" disabled={loading} className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-[#1a2e6f] hover:bg-[#152460] rounded-lg transition disabled:opacity-60">
-              {loading && <Loader2 size={14} className="animate-spin" />}
-              {isEdit ? "Simpan" : "Tambah"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
+// Modals have been moved to separate pages.
 
 function DeleteModal({ isOpen, onClose, onConfirm, name, loading }) {
   if (!isOpen) return null;
@@ -144,8 +32,6 @@ export default function JenisSuratPage() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editData, setEditData] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -166,9 +52,7 @@ export default function JenisSuratPage() {
 
   useEffect(() => { fetchData(); }, []);
 
-  const handleAdd = () => { setEditData(null); setModalOpen(true); };
-  const handleEdit = (lt, catId) => { setEditData({ ...lt, letterCategoryId: catId }); setModalOpen(true); };
-  const handleSave = () => { setModalOpen(false); fetchData(); };
+  useEffect(() => { fetchData(); }, []);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -194,14 +78,14 @@ export default function JenisSuratPage() {
           <h1 className="text-2xl font-bold text-gray-900">Jenis Surat</h1>
           <p className="text-sm text-gray-500 mt-1">Kelola jenis surat yang tersedia untuk pengajuan.</p>
         </div>
-        <button
-          onClick={handleAdd}
+        <a
+          href="/admin/jenis-surat/create"
           id="admin-add-letter-type"
           className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-[#1a2e6f] hover:bg-[#152460] rounded-xl transition shadow-sm"
         >
           <Plus size={16} />
           Tambah Jenis Surat
-        </button>
+        </a>
       </div>
 
       {/* Content */}
@@ -226,7 +110,7 @@ export default function JenisSuratPage() {
               <tr className="border-b border-gray-100 text-left">
                 <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Nama Surat</th>
                 <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Kategori</th>
-                <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Template</th>
+                <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Deskripsi</th>
                 <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide text-right">Aksi</th>
               </tr>
             </thead>
@@ -235,7 +119,6 @@ export default function JenisSuratPage() {
                 <tr key={lt.id} className={`border-b border-gray-50 hover:bg-gray-50/50 transition ${i % 2 === 0 ? "" : "bg-gray-50/30"}`}>
                   <td className="px-5 py-3.5">
                     <p className="font-medium text-gray-800">{lt.name}</p>
-                    {lt.description && <p className="text-xs text-gray-400 mt-0.5">{lt.description}</p>}
                   </td>
                   <td className="px-5 py-3.5">
                     <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full bg-[#1a2e6f]/10 text-[#1a2e6f]">
@@ -243,21 +126,28 @@ export default function JenisSuratPage() {
                     </span>
                   </td>
                   <td className="px-5 py-3.5">
-                    {lt.templatePath ? (
-                      <span className="text-xs text-gray-500 font-mono truncate max-w-[180px] block">{lt.templatePath}</span>
+                    {lt.description ? (
+                      <span className="text-xs text-gray-500">{lt.description}</span>
                     ) : (
                       <span className="text-xs text-gray-300 italic">Tidak ada</span>
                     )}
                   </td>
                   <td className="px-5 py-3.5">
                     <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => handleEdit(lt, lt.categoryId)}
+                      <Link
+                        href={`/admin/jenis-surat/${lt.id}`}
+                        className="p-2 rounded-lg text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 transition"
+                        title="Lihat Detail"
+                      >
+                        <Eye size={15} />
+                      </Link>
+                      <Link
+                        href={`/admin/jenis-surat/${lt.id}/edit`}
                         className="p-2 rounded-lg text-gray-400 hover:text-[#1a2e6f] hover:bg-[#1a2e6f]/10 transition"
                         title="Edit"
                       >
                         <Pencil size={15} />
-                      </button>
+                      </Link>
                       <button
                         onClick={() => setDeleteTarget(lt)}
                         className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
@@ -275,13 +165,6 @@ export default function JenisSuratPage() {
       </div>
 
       {/* Modals */}
-      <LetterTypeModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSave={handleSave}
-        categories={categories}
-        editData={editData}
-      />
       <DeleteModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}

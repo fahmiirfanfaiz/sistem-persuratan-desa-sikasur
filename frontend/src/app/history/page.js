@@ -69,9 +69,12 @@ function formatDate(isoString) {
 }
 
 // ─── Submission Card ───────────────────────────────────────────────────────────
-function SubmissionCard({ submission, index }) {
+function SubmissionCard({ submission }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200 p-5">
+    <Link
+      href={`/history/${submission.id}`}
+      className="block bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#1a2e6f]/20 transition-all duration-200 p-5 group cursor-pointer"
+    >
       <div className="flex items-start justify-between gap-4">
         {/* Icon + Info */}
         <div className="flex items-start gap-4 min-w-0">
@@ -92,12 +95,13 @@ function SubmissionCard({ submission, index }) {
           </div>
         </div>
 
-        {/* Status */}
-        <div className="flex-shrink-0">
+        {/* Status + Chevron */}
+        <div className="flex items-center gap-2 flex-shrink-0">
           <StatusBadge status={submission.status} />
+          <ChevronRight size={16} className="text-gray-300 group-hover:text-[#1a2e6f] transition-colors" />
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -240,8 +244,8 @@ export default function HistoryPage() {
           <EmptyState />
         ) : (
           <div className="flex flex-col gap-3">
-            {submissions.map((submission, i) => (
-              <SubmissionCard key={submission.id} submission={submission} index={i} />
+            {submissions.map((submission) => (
+              <SubmissionCard key={submission.id} submission={submission} />
             ))}
           </div>
         )}

@@ -15,6 +15,7 @@ import {
   ChevronsRight,
   UserCheck,
   UserX,
+  Eye,
 } from "lucide-react";
 
 function formatDate(iso) {
@@ -25,140 +26,7 @@ function formatDate(iso) {
   }).format(new Date(iso));
 }
 
-// ─── Edit Modal ────────────────────────────────────────────────────────────────
-function EditUserModal({ isOpen, onClose, onSave, userData }) {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phoneNumber: "",
-    address: "",
-    role: "USER",
-    isActive: true,
-    password: "",
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (isOpen && userData) {
-      setForm({
-        name: userData.name ?? "",
-        email: userData.email ?? "",
-        phoneNumber: userData.phoneNumber ?? "",
-        address: userData.address ?? "",
-        role: userData.role ?? "USER",
-        isActive: userData.isActive ?? true,
-        password: "",
-      });
-      setError("");
-    }
-  }, [isOpen, userData]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    try {
-      const body = { ...form };
-      if (!body.password) delete body.password;
-      const res = await apiFetch(`/api/admin/users/${userData.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const json = await res.json();
-      if (!res.ok) { setError(json.message || "Terjadi kesalahan"); return; }
-      onSave();
-    } catch {
-      setError("Gagal terhubung ke server");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 p-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-bold text-gray-900">Edit Pengguna</h2>
-          <button onClick={onClose} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition"><X size={16} /></button>
-        </div>
-
-        {error && <div className="mb-4 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700">{error}</div>}
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1.5">Nama</label>
-              <input type="text" value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f]" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1.5">Email</label>
-              <input type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f]" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1.5">No Telepon</label>
-              <input type="tel" value={form.phoneNumber} onChange={(e) => setForm((p) => ({ ...p, phoneNumber: e.target.value }))}
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f]" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1.5">Role</label>
-              <select value={form.role} onChange={(e) => setForm((p) => ({ ...p, role: e.target.value }))}
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f]">
-                <option value="USER">User</option>
-                <option value="ADMIN">Admin</option>
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1.5">Alamat</label>
-            <input type="text" value={form.address} onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))}
-              className="w-full h-10 px-3 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f]" />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1.5">Password Baru <span className="text-gray-400">(biarkan kosong jika tidak diubah)</span></label>
-              <input type="password" value={form.password} onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
-                placeholder="••••••••"
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f]" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1.5">Status Akun</label>
-              <div className="flex items-center gap-3 h-10">
-                <button type="button"
-                  onClick={() => setForm((p) => ({ ...p, isActive: !p.isActive }))}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${form.isActive ? "bg-[#1a2e6f]" : "bg-gray-300"}`}
-                >
-                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${form.isActive ? "translate-x-6" : "translate-x-1"}`} />
-                </button>
-                <span className={`text-sm font-medium ${form.isActive ? "text-emerald-600" : "text-gray-400"}`}>
-                  {form.isActive ? "Aktif" : "Non-aktif"}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={onClose} className="px-5 py-2 text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Batal</button>
-            <button type="submit" disabled={loading} className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-[#1a2e6f] hover:bg-[#152460] rounded-lg transition disabled:opacity-60">
-              {loading && <Loader2 size={14} className="animate-spin" />}
-              Simpan
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
 
 function DeleteModal({ isOpen, onClose, onConfirm, name, loading }) {
   if (!isOpen) return null;
@@ -191,7 +59,6 @@ export default function PenggunaPage() {
   const [searchInput, setSearchInput] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [editTarget, setEditTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -316,9 +183,12 @@ export default function PenggunaPage() {
                     <td className="px-5 py-3.5 text-gray-400 text-xs">{formatDate(u.createdAt)}</td>
                     <td className="px-5 py-3.5">
                       <div className="flex items-center justify-end gap-2">
-                        <button onClick={() => setEditTarget(u)} className="p-2 rounded-lg text-gray-400 hover:text-[#1a2e6f] hover:bg-[#1a2e6f]/10 transition" title="Edit">
+                        <a href={`/admin/pengguna/${u.id}`} className="p-2 rounded-lg text-gray-400 hover:text-[#1a2e6f] hover:bg-[#1a2e6f]/10 transition" title="Detail">
+                          <Eye size={15} />
+                        </a>
+                        <a href={`/admin/pengguna/${u.id}/edit`} className="p-2 rounded-lg text-gray-400 hover:text-[#1a2e6f] hover:bg-[#1a2e6f]/10 transition" title="Edit">
                           <Pencil size={15} />
-                        </button>
+                        </a>
                         <button onClick={() => setDeleteTarget(u)} className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition" title="Hapus">
                           <Trash2 size={15} />
                         </button>
@@ -353,12 +223,6 @@ export default function PenggunaPage() {
       )}
 
       {/* Modals */}
-      <EditUserModal
-        isOpen={!!editTarget}
-        onClose={() => setEditTarget(null)}
-        onSave={() => { setEditTarget(null); fetchData(); }}
-        userData={editTarget}
-      />
       <DeleteModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}

@@ -55,6 +55,9 @@ router.patch(
   adminController.updateSubmissionStatus
 );
 
+// DELETE /api/admin/submissions/:id
+router.delete("/submissions/:id", adminController.deleteSubmission);
+
 // ─── Letter Templates — download by letterTypeId ──────────────────────────────
 // GET /api/admin/letter-types/:letterTypeId/template/download
 router.get(
@@ -73,6 +76,8 @@ router.delete("/categories/:id", adminController.deleteCategory);
 // ─── Letter Types CRUD ─────────────────────────────────────────────────────────
 // POST /api/admin/letter-types
 router.post("/letter-types", adminController.createLetterType);
+// GET /api/admin/letter-types/:id
+router.get("/letter-types/:id", adminController.getLetterTypeDetail);
 // PUT /api/admin/letter-types/:id
 router.put("/letter-types/:id", adminController.updateLetterType);
 // DELETE /api/admin/letter-types/:id
@@ -81,6 +86,8 @@ router.delete("/letter-types/:id", adminController.deleteLetterType);
 // ─── Users CRUD ────────────────────────────────────────────────────────────────
 // GET /api/admin/users?search=&page=1&limit=10
 router.get("/users", adminController.getAllUsers);
+// GET /api/admin/users/:id
+router.get("/users/:id", adminController.getUserDetail);
 // PUT /api/admin/users/:id
 router.put("/users/:id", adminController.updateUser);
 // DELETE /api/admin/users/:id

@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { ChevronDown, User, LogOut, Bell, History, LayoutDashboard } from "lucide-react";
-import { getStoredUser, clearAuth } from "@/lib/api";
+import { getStoredUser, clearAuth, apiFetch } from "@/lib/api";
 import LogoutModal from "./LogoutModal";
 
 /**
@@ -19,10 +19,23 @@ export default function Navbar() {
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    setUser(getStoredUser());
+    const storedUser = getStoredUser();
+    setUser(storedUser);
+    if (storedUser) {
+      // Fetch unread notification count
+      apiFetch("/api/users/me/notifications")
+        .then((res) => res.ok ? res.json() : null)
+        .then((json) => {
+          if (json?.data) {
+            setUnreadCount(json.data.filter((n) => !n.isRead).length);
+          }
+        })
+        .catch(() => {/* fail silently */});
+    }
   }, [pathname]); // re-read on navigation to pick up auth changes
 
   // Close dropdown when clicking outside
@@ -99,6 +112,11 @@ export default function Navbar() {
                 title="Notifikasi"
               >
                 <Bell size={20} strokeWidth={1.75} />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1 shadow-sm ring-2 ring-white">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
               </Link>
 
               {/* Riwayat Pengajuan */}

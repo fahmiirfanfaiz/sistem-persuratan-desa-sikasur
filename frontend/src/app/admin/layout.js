@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,6 +12,8 @@ import {
   LogOut,
   Menu,
   X,
+  ArrowLeft,
+  Bell,
 } from "lucide-react";
 import { getStoredUser, clearAuth } from "@/lib/api";
 import LogoutModal from "@/components/LogoutModal";
@@ -30,6 +32,19 @@ export default function AdminLayout({ children }) {
   const [authChecked, setAuthChecked] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const fetchUnreadCount = useCallback(async () => {
+    try {
+      const res = await apiFetch("/api/users/me/notifications");
+      if (!res.ok) return;
+      const json = await res.json();
+      const notifs = json.data ?? [];
+      setUnreadCount(notifs.filter((n) => !n.isRead).length);
+    } catch {
+      // fail silently
+    }
+  }, []);
 
   useEffect(() => {
     const stored = getStoredUser();
@@ -39,7 +54,8 @@ export default function AdminLayout({ children }) {
     }
     setUser(stored);
     setAuthChecked(true);
-  }, []); // run once on mount — localStorage is available client-side
+    fetchUnreadCount();
+  }, [fetchUnreadCount]); // run once on mount — localStorage is available client-side
 
   const handleLogout = () => {
     clearAuth();
@@ -74,7 +90,7 @@ export default function AdminLayout({ children }) {
 
       {/* ── Sidebar ── */}
       <aside
-        className={`fixed top-0 left-0 h-full w-[200px] bg-white border-r border-gray-100 shadow-sm z-40 flex flex-col transition-transform duration-300 ${
+        className={`fixed top-0 left-0 h-screen w-[200px] bg-white border-r border-gray-100 shadow-sm z-40 flex flex-col transition-transform duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 lg:static lg:z-auto`}
       >
@@ -157,10 +173,40 @@ export default function AdminLayout({ children }) {
             )}
           </div>
 
-          {/* Right: Avatar */}
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <div className="w-8 h-8 rounded-full bg-[#1a2e6f] text-white text-xs font-bold flex items-center justify-center">
-              {user.name?.charAt(0)?.toUpperCase() ?? "A"}
+          {/* Right: Notification, Website Link, Avatar */}
+          <div className="flex items-center gap-4 flex-shrink-0">
+            <Link
+              href="/admin/notifications"
+              className={`relative p-2 rounded-lg transition ${
+                pathname === "/admin/notifications"
+                  ? "bg-[#1a2e6f]/10 text-[#1a2e6f]"
+                  : "text-gray-400 hover:bg-gray-100 hover:text-[#1a2e6f]"
+              }`}
+              title="Notifikasi"
+            >
+              <Bell size={18} />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1 shadow-sm ring-2 ring-white">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </Link>
+
+            <Link 
+              href="/" 
+              className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-[#1a2e6f] transition bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-100"
+            >
+              <ArrowLeft size={14} />
+              <span className="hidden sm:inline">Kembali ke beranda</span>
+            </Link>
+
+            <div className="flex items-center gap-2 pl-2 border-l border-gray-200">
+              <div className="w-8 h-8 rounded-full bg-[#1a2e6f] text-white text-xs font-bold flex items-center justify-center">
+                {user.name?.charAt(0)?.toUpperCase() ?? "A"}
+              </div>
+              <span className="text-sm font-semibold text-gray-700 hidden sm:block">
+                {user.name}
+              </span>
             </div>
           </div>
         </header>

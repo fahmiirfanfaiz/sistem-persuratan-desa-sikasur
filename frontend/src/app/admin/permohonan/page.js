@@ -13,6 +13,9 @@ import {
   Loader2,
   AlertCircle,
   ArrowUpDown,
+  Pencil,
+  Trash2,
+  X,
 } from "lucide-react";
 
 function formatDate(iso) {
@@ -42,6 +45,25 @@ function StatusBadge({ status }) {
 
 const PAGE_SIZE_OPTIONS = [10, 20, 50];
 
+function DeleteModal({ isOpen, onClose, onConfirm, name, loading }) {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+        <h2 className="text-base font-bold text-gray-900 mb-2">Hapus Permohonan</h2>
+        <p className="text-sm text-gray-500 mb-6">Apakah Anda yakin ingin menghapus permohonan dari <span className="font-semibold text-gray-700">"{name}"</span>? Tindakan ini tidak dapat dibatalkan.</p>
+        <div className="flex justify-end gap-3">
+          <button onClick={onClose} className="px-5 py-2 text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Batal</button>
+          <button onClick={onConfirm} disabled={loading} className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition disabled:opacity-60">
+            {loading && <Loader2 size={14} className="animate-spin" />}
+            Hapus
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function PermohonanPage() {
   const [submissions, setSubmissions] = useState([]);
   const [total, setTotal] = useState(0);
@@ -52,6 +74,8 @@ export default function PermohonanPage() {
   const [sort, setSort] = useState("newest");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
@@ -91,6 +115,17 @@ export default function PermohonanPage() {
   const handleSortToggle = () => {
     setSort((s) => (s === "newest" ? "oldest" : "newest"));
     setPage(1);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      const res = await apiFetch(`/api/admin/submissions/${deleteTarget.id}`, { method: "DELETE" });
+      if (res.ok) { setDeleteTarget(null); fetchData(); }
+      else { const j = await res.json(); alert(j.message || "Gagal menghapus"); }
+    } catch { alert("Gagal terhubung ke server"); }
+    finally { setDeleting(false); }
   };
 
   return (
@@ -165,14 +200,28 @@ export default function PermohonanPage() {
                     <td className="px-5 py-3.5 text-gray-500">{formatDate(sub.createdAt)}</td>
                     <td className="px-5 py-3.5"><StatusBadge status={sub.status} /></td>
                     <td className="px-5 py-3.5">
-                      <div className="flex justify-center">
+                      <div className="flex justify-center gap-2">
                         <Link
                           href={`/admin/permohonan/${sub.id}`}
-                          className="p-2 rounded-lg text-gray-400 hover:text-[#1a2e6f] hover:bg-[#1a2e6f]/10 transition"
+                          className="p-2 rounded-lg text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 transition"
                           title="Lihat Detail"
                         >
-                          <Eye size={16} />
+                          <Eye size={15} />
                         </Link>
+                        <Link
+                          href={`/admin/permohonan/${sub.id}/edit`}
+                          className="p-2 rounded-lg text-gray-400 hover:text-[#1a2e6f] hover:bg-[#1a2e6f]/10 transition"
+                          title="Edit Status"
+                        >
+                          <Pencil size={15} />
+                        </Link>
+                        <button
+                          onClick={() => setDeleteTarget(sub)}
+                          className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
+                          title="Hapus"
+                        >
+                          <Trash2 size={15} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -208,6 +257,15 @@ export default function PermohonanPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Modal */}
+      <DeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        name={deleteTarget?.user?.name ?? ""}
+        loading={deleting}
+      />
     </div>
   );
 }

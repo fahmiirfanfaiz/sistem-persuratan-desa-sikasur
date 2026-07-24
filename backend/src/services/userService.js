@@ -101,6 +101,39 @@ const getAllUsers = async ({ search = "", page = 1, limit = 10 } = {}) => {
 };
 
 /**
+ * Get a user by ID (admin).
+ */
+const getUserById = async (userId) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      nik: true,
+      familyCardNumber: true,
+      phoneNumber: true,
+      address: true,
+      role: true,
+      isActive: true,
+      createdAt: true,
+      submissions: {
+        select: {
+          id: true,
+          status: true,
+          purpose: true,
+          createdAt: true,
+          letterType: { select: { id: true, name: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      },
+    },
+  });
+  if (!user) throw new ClientError("Pengguna tidak ditemukan", 404);
+  return user;
+};
+
+/**
  * Update a user (admin).
  */
 const updateUser = async (userId, data) => {
@@ -177,6 +210,7 @@ export default {
   getMe,
   updateMe,
   getAllUsers,
+  getUserById,
   updateUser,
   deleteUser,
   getUserNotifications,

@@ -60,6 +60,20 @@ const updateSubmissionStatus = async (req, res) => {
   }
 };
 
+const deleteSubmission = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await submissionService.deleteSubmission(id);
+    return res.status(200).json({ success: true, message: "Permohonan berhasil dihapus" });
+  } catch (error) {
+    if (error.name === "ClientError") {
+      return res.status(error.statusCode || 400).json({ success: false, message: error.message });
+    }
+    console.error("[admin.deleteSubmission]", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 const getDocumentDownloadUrl = async (req, res) => {
   try {
     const { id, documentId } = req.params;
@@ -158,6 +172,20 @@ const createLetterType = async (req, res) => {
   }
 };
 
+const getLetterTypeDetail = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const lt = await letterService.getLetterTypeById(id);
+    return res.status(200).json({ success: true, data: lt });
+  } catch (error) {
+    if (error.name === "ClientError") {
+      return res.status(error.statusCode || 400).json({ success: false, message: error.message });
+    }
+    console.error("[admin.getLetterTypeDetail]", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 const updateLetterType = async (req, res) => {
   try {
     const { id } = req.params;
@@ -204,6 +232,20 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+const getUserDetail = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await userService.getUserById(id);
+    return res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    if (error.name === "ClientError") {
+      return res.status(error.statusCode || 400).json({ success: false, message: error.message });
+    }
+    console.error("[admin.getUserDetail]", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -239,6 +281,7 @@ export default {
   getAllSubmissions,
   getSubmissionDetail,
   updateSubmissionStatus,
+  deleteSubmission,
   getDocumentDownloadUrl,
   getTemplateDownloadUrl,
   getDashboardStats,
@@ -246,9 +289,11 @@ export default {
   updateCategory,
   deleteCategory,
   createLetterType,
+  getLetterTypeDetail,
   updateLetterType,
   deleteLetterType,
   getAllUsers,
+  getUserDetail,
   updateUser,
   deleteUser,
 };

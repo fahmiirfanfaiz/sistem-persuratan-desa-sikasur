@@ -55,6 +55,21 @@ const getMySubmissions = async (req, res) => {
   }
 };
 
+const getMySubmissionDetail = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { id } = req.params;
+    const submission = await submissionService.getSubmissionByIdForUser(id, userId);
+    return res.status(200).json({ success: true, data: submission });
+  } catch (error) {
+    if (error instanceof ClientError) {
+      return res.status(error.statusCode).json({ success: false, message: error.message });
+    }
+    console.error("[getMySubmissionDetail]", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 const getGeneratedLetterUrl = async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -70,4 +85,4 @@ const getGeneratedLetterUrl = async (req, res) => {
   }
 };
 
-export default { create, getMySubmissions, getGeneratedLetterUrl };
+export default { create, getMySubmissions, getMySubmissionDetail, getGeneratedLetterUrl };

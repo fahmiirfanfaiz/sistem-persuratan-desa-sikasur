@@ -12,7 +12,7 @@ const s3Client = new S3Client({
 });
 
 export const BUCKET_NAME = process.env.S3_BUCKET || "bucket";
-export const TEMPLATE_FOLDER = process.env.S3_TEMPLATE_FOLDER || "letter-template";
+export const TEMPLATE_FOLDER = "letter-templates";
 
 /**
  * Generate a presigned URL for downloading an object from S3.
@@ -20,8 +20,14 @@ export const TEMPLATE_FOLDER = process.env.S3_TEMPLATE_FOLDER || "letter-templat
  * @param {string} bucket - bucket name (defaults to BUCKET_NAME)
  * @param {number} expiresIn - seconds until URL expires (default 60)
  */
-export const getSignedDownloadUrl = async (key, bucket = BUCKET_NAME, expiresIn = 60) => {
-  const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+export const getSignedDownloadUrl = async (key, bucket = BUCKET_NAME, expiresIn = 60, asAttachment = false, filename = null) => {
+  const params = { Bucket: bucket, Key: key };
+  if (asAttachment) {
+    let disposition = "attachment";
+    if (filename) disposition += `; filename="${filename}"`;
+    params.ResponseContentDisposition = disposition;
+  }
+  const command = new GetObjectCommand(params);
   return getSignedUrl(s3Client, command, { expiresIn });
 };
 

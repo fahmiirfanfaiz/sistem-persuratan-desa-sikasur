@@ -74,6 +74,26 @@ const deleteCategory = async (id) => {
 };
 
 /**
+ * Get letter type by ID.
+ */
+const getLetterTypeById = async (id) => {
+  const lt = await prisma.letterType.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      templatePath: true,
+      createdAt: true,
+      updatedAt: true,
+      letterCategory: { select: { id: true, name: true } },
+    }
+  });
+  if (!lt) throw new ClientError("Jenis surat tidak ditemukan", 404);
+  return lt;
+};
+
+/**
  * Create a new letter type.
  */
 const createLetterType = async ({ letterCategoryId, name, description, templatePath }) => {
@@ -139,6 +159,7 @@ export default {
   createCategory,
   updateCategory,
   deleteCategory,
+  getLetterTypeById,
   createLetterType,
   updateLetterType,
   deleteLetterType,
