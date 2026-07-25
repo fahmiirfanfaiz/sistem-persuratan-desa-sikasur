@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { ChevronDown, User, LogOut, Bell, History, LayoutDashboard } from "lucide-react";
-import { getStoredUser, clearAuth, apiFetch } from "@/lib/api";
+import { getStoredUser, logoutAuth, apiFetch } from "@/lib/api";
 import LogoutModal from "./LogoutModal";
 
 /**
@@ -49,8 +49,8 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogoutConfirm = () => {
-    clearAuth();
+  const handleLogoutConfirm = async () => {
+    await logoutAuth();
     setUser(null);
     setLogoutModalOpen(false);
     setDropdownOpen(false);
@@ -63,18 +63,18 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-40 w-full bg-white border-b border-gray-100 shadow-sm">
-        <div className="max-w-[1140px] mx-auto px-6 h-[72px] flex items-center justify-between">
+        <div className="max-w-[1140px] mx-auto px-4 sm:px-6 h-[72px] flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 flex-shrink-0">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <Image
               src="/images/logo-pemalang.svg"
               alt="Logo Pemalang"
               width={32}
               height={43}
-              className="object-contain"
+              className="object-contain w-7 sm:w-8"
               priority
             />
-            <span className="text-[11px] font-bold text-[#1a2e6f] uppercase leading-tight max-w-[180px]">
+            <span className="hidden sm:block text-[11px] font-bold text-[#1a2e6f] uppercase leading-tight max-w-[180px]">
               Sistem Persuratan Digital
             </span>
           </Link>

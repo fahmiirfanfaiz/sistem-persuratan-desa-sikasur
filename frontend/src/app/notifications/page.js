@@ -198,39 +198,40 @@ export default function NotificationsPage() {
     <div className="min-h-screen flex flex-col bg-[#f8f9fc]">
       <Navbar />
 
-      <main className="flex-1 max-w-[1140px] mx-auto w-full px-6 py-10">
+      <main className="flex-1 max-w-[1140px] mx-auto w-full px-4 sm:px-6 py-8 sm:py-10">
         {/* Breadcrumb + Back button */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2 text-xs text-gray-400">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 text-[11px] sm:text-xs text-gray-400">
             <Link href="/" className="hover:text-[#1a2e6f] transition">Beranda</Link>
             <ChevronRight size={12} />
             <span className="text-gray-600">Notifikasi</span>
           </div>
-          <Link href="/" className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-[#1a2e6f] transition">
+          <Link href="/" className="flex items-center gap-1.5 text-xs sm:text-sm font-medium text-gray-500 hover:text-[#1a2e6f] transition">
             <ArrowLeft size={16} />
-            Kembali ke Beranda
+            <span className="hidden sm:inline">Kembali ke Beranda</span>
+            <span className="sm:hidden">Kembali</span>
           </Link>
         </div>
 
         {/* Page Header */}
-        <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Bell size={24} className="text-[#1a2e6f]" />
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <Bell size={24} className="text-[#1a2e6f] hidden sm:block" />
               Notifikasi
               {unreadCount > 0 && (
-                <span className="ml-1 px-2 py-0.5 text-xs font-bold text-white bg-[#1a2e6f] rounded-full">
+                <span className="ml-1 px-2 py-0.5 text-[10px] sm:text-xs font-bold text-white bg-[#1a2e6f] rounded-full">
                   {unreadCount}
                 </span>
               )}
             </h1>
-            <p className="text-sm text-gray-500 mt-1">Status terbaru pengajuan surat Anda</p>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">Status terbaru pengajuan surat Anda</p>
           </div>
 
           {!loading && notifications.length > 0 && unreadCount > 0 && (
             <button
               onClick={handleMarkAllRead}
-              className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-[#1a2e6f] border border-[#1a2e6f]/30 rounded-xl hover:bg-[#1a2e6f]/5 transition"
+              className="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2 text-xs font-semibold text-[#1a2e6f] border border-[#1a2e6f]/30 rounded-xl hover:bg-[#1a2e6f]/5 transition"
             >
               <CheckCheck size={14} />
               Tandai semua dibaca

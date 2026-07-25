@@ -411,15 +411,15 @@ export default function SubmissionPage() {
       </section>
 
       {/* Form Card */}
-      <main className="flex-1 py-10">
-        <div className="max-w-[720px] mx-auto px-4">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-8 py-8">
+      <main className="flex-1 py-6 sm:py-10">
+        <div className="max-w-[720px] mx-auto px-4 sm:px-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-5 py-6 sm:px-8 sm:py-8">
             {/* Title */}
             <div className="text-center mb-6">
               <h2 className="text-lg font-bold text-gray-900">
                 Data Permohonan Surat
               </h2>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-xs sm:text-sm text-gray-500 mt-1">
                 Silakan lengkapi data diri dan dokumen pendukung untuk mengajukan
                 permohonan surat.
               </p>
@@ -435,7 +435,7 @@ export default function SubmissionPage() {
                 <p className="text-xs font-semibold text-[#1a6fa8]">
                   Perhatian
                 </p>
-                <p className="text-xs text-[#1a6fa8] mt-0.5 leading-relaxed">
+                <p className="text-[11px] sm:text-xs text-[#1a6fa8] mt-0.5 leading-relaxed">
                   Pastikan Data Yang Anda Masukkan Sudah Benar. Dokumen KK Dan
                   KTP Harus Jelas, Terbaca, Dan Sesuai Dengan Identitas Pemohon.
                 </p>
@@ -644,17 +644,17 @@ export default function SubmissionPage() {
               </div>
 
               {/* ── Actions ───────────────────────────────────────── */}
-              <div className="flex items-center justify-between pt-2">
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0 pt-2">
                 <button
                   type="button"
                   onClick={() => router.back()}
-                  className="px-6 py-2.5 text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition focus:outline-none focus:ring-2 focus:ring-gray-200"
+                  className="w-full sm:w-auto px-6 py-2.5 text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition focus:outline-none focus:ring-2 focus:ring-gray-200"
                 >
                   Kembali
                 </button>
                 <button
                   type="submit"
-                  className="px-7 py-2.5 text-sm font-semibold text-white bg-[#1a2e6f] hover:bg-[#152460] rounded-lg transition focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/40"
+                  className="w-full sm:w-auto px-7 py-2.5 text-sm font-semibold text-white bg-[#1a2e6f] hover:bg-[#152460] rounded-lg transition focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/40"
                 >
                   Kirim
                 </button>
@@ -662,6 +662,7 @@ export default function SubmissionPage() {
             </form>
           </div>
         </div>
+
       </main>
 
       <Footer />

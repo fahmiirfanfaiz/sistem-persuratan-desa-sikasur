@@ -15,7 +15,7 @@ import {
   ArrowLeft,
   Bell,
 } from "lucide-react";
-import { getStoredUser, clearAuth } from "@/lib/api";
+import { getStoredUser, logoutAuth, apiFetch } from "@/lib/api";
 import LogoutModal from "@/components/LogoutModal";
 
 const NAV_ITEMS = [
@@ -55,10 +55,14 @@ export default function AdminLayout({ children }) {
     setUser(stored);
     setAuthChecked(true);
     fetchUnreadCount();
-  }, [fetchUnreadCount]); // run once on mount — localStorage is available client-side
 
-  const handleLogout = () => {
-    clearAuth();
+    // Poll notifications every 60 seconds
+    const intervalId = setInterval(fetchUnreadCount, 60000);
+    return () => clearInterval(intervalId);
+  }, [fetchUnreadCount, router]);
+
+  const handleLogout = async () => {
+    await logoutAuth();
     setLogoutOpen(false);
     router.push("/");
     router.refresh();

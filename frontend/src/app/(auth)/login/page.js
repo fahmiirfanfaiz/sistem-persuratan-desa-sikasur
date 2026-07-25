@@ -37,6 +37,7 @@ function LoginForm() {
       const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // Required for HttpOnly cookie
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
@@ -62,6 +63,7 @@ function LoginForm() {
 
       // Redirect to landing page after successful login
       router.push("/");
+
     } catch {
       setError("Tidak dapat terhubung ke server. Pastikan backend berjalan.");
     } finally {
