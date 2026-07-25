@@ -37,61 +37,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Kontak */}
-        <div>
-          <p className="text-xs font-bold text-white uppercase tracking-widest mb-4">
-            Kontak
-          </p>
-          <div className="flex flex-col gap-3">
-            <a
-              href="https://maps.google.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-start gap-2 text-xs text-gray-400 hover:text-white transition"
-            >
-              <MapPin size={13} className="mt-0.5 flex-shrink-0" />
-              VRQF+JPH, Sikasur, Kec. Belik, Kabupaten Pemalang
-            </a>
-            <a
-              href="tel:+620274371716"
-              className="flex items-center gap-2 text-xs text-gray-400 hover:text-white transition"
-            >
-              <Phone size={13} className="flex-shrink-0" />
-              (0274)371716
-            </a>
-            <a
-              href="fax:+620274371716"
-              className="flex items-center gap-2 text-xs text-gray-400 hover:text-white transition"
-            >
-              {/* Fax icon */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="flex-shrink-0"
-              >
-                <path d="M22 17H2a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h1" />
-                <path d="M8 21h8" />
-                <rect x="8" y="3" width="8" height="14" rx="2" />
-              </svg>
-              (0274)371716
-            </a>
-            <a
-              href="mailto:balaidesasikasur@gmail.com"
-              className="flex items-center gap-2 text-xs text-gray-400 hover:text-white transition"
-            >
-              <Mail size={13} className="flex-shrink-0" />
-              balaidesasikasur@gmail.com
-            </a>
-          </div>
-        </div>
-
         {/* Social Media */}
         <div>
           <p className="text-xs font-bold text-white uppercase tracking-widest mb-4">
@@ -99,18 +44,11 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-4">
             <a
-              href="https://www.instagram.com/gemercikbelik"
+              href="https://www.instagram.com/pemdessikasur"
               aria-label="Instagram"
               className="text-gray-400 hover:text-white transition"
             >
               <FaInstagram size={20} />
-            </a>
-            <a
-              href="https://www.youtube.com/@KKNBelikUGM"
-              aria-label="YouTube"
-              className="text-gray-400 hover:text-white transition"
-            >
-              <FaYoutube size={20} />
             </a>
           </div>
         </div>
@@ -120,7 +58,7 @@ export default function Footer() {
       <div className="border-t border-white/10 py-4 text-center text-[11px] text-gray-500">
         Developed by{" "}
         <span className="font-semibold text-gray-400">
-          KKN-PPM UGM Periode II 2026
+          KKN-PPM UGM Gemercik Belik Periode 2 2026
         </span>
       </div>
     </footer>

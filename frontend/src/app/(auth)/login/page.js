@@ -127,7 +127,7 @@ function LoginForm() {
                 name="email"
                 type="email"
                 autoComplete="email"
-                placeholder="kiranacantik@example.com"
+                placeholder="johndoe@gmail.com"
                 value={formData.email}
                 onChange={handleChange}
                 className="pl-10 py-3 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"

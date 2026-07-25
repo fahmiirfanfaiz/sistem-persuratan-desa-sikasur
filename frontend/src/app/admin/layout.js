@@ -90,7 +90,7 @@ export default function AdminLayout({ children }) {
 
       {/* ── Sidebar ── */}
       <aside
-        className={`fixed top-0 left-0 h-screen w-[200px] bg-white border-r border-gray-100 shadow-sm z-40 flex flex-col transition-transform duration-300 ${
+        className={`fixed top-0 left-0 h-screen w-[242px] bg-white border-r border-gray-100 shadow-sm z-40 flex flex-col transition-transform duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 lg:static lg:z-auto`}
       >
@@ -103,7 +103,7 @@ export default function AdminLayout({ children }) {
             height={38}
             className="object-contain flex-shrink-0"
           />
-          <span className="text-[10px] font-bold text-[#1a2e6f] uppercase leading-tight">
+          <span className="text-[11px] font-bold text-[#1a2e6f] uppercase leading-tight">
             Sistem Persuratan Digital
           </span>
         </div>
