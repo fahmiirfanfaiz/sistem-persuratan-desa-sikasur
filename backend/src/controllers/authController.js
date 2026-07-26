@@ -138,4 +138,52 @@ const logout = async (req, res) => {
   }
 };
 
-export default { register, login, refresh, logout };
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    await authService.forgotPassword(email);
+    
+    return res.status(200).json({
+      success: true,
+      message: "Tautan reset password telah dikirim ke email Anda.",
+    });
+  } catch (error) {
+    if (error instanceof ClientError) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message,
+      });
+    }
+    console.error("[forgotPassword]", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    await authService.resetPassword(token, newPassword);
+
+    return res.status(200).json({
+      success: true,
+      message: "Password berhasil diubah",
+    });
+  } catch (error) {
+    if (error instanceof ClientError) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message,
+      });
+    }
+    console.error("[resetPassword]", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export default { register, login, refresh, logout, forgotPassword, resetPassword };

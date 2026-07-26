@@ -37,10 +37,10 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Social Media */}
+        {/* Media Sosial */}
         <div>
           <p className="text-xs font-bold text-white uppercase tracking-widest mb-4">
-            Sosial Media
+            Media Sosial
           </p>
           <div className="flex items-center gap-4">
             <a
@@ -56,9 +56,9 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-white/10 py-4 text-center text-[11px] text-gray-500">
-        Developed by{" "}
+        Dikembangkan oleh{" "}
         <span className="font-semibold text-gray-400">
-          KKN-PPM UGM Gemercik Belik Periode 2 2026
+          Tim KKN-PPM UGM Gemercik Belik Periode 2 2026
         </span>
       </div>
     </footer>

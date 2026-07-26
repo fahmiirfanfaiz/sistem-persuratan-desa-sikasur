@@ -74,7 +74,7 @@ export default function Navbar() {
               className="object-contain w-7 sm:w-8"
               priority
             />
-            <span className="hidden sm:block text-[11px] font-bold text-[#1a2e6f] uppercase leading-tight max-w-[180px]">
+            <span className="block sm:text-[11px] text-[13px] font-bold text-[#1a2e6f] uppercase leading-tight max-w-[180px]">
               Sistem Persuratan Digital
             </span>
           </Link>

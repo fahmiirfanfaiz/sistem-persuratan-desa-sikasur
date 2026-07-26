@@ -15,4 +15,10 @@ router.post("/refresh", authController.refresh);
 // Logout route — revoke refresh token from DB + clear cookie
 router.post("/logout", authController.logout);
 
+// Forgot password route
+router.post("/forgot-password", authController.forgotPassword);
+
+// Reset password route
+router.post("/reset-password", authController.resetPassword);
+
 export default router;

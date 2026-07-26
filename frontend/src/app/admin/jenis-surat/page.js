@@ -105,62 +105,64 @@ export default function JenisSuratPage() {
             <p className="text-sm text-gray-400">Belum ada jenis surat. Tambahkan sekarang.</p>
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-100 text-left">
-                <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Nama Surat</th>
-                <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Kategori</th>
-                <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Deskripsi</th>
-                <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide text-right">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {allLetterTypes.map((lt, i) => (
-                <tr key={lt.id} className={`border-b border-gray-50 hover:bg-gray-50/50 transition ${i % 2 === 0 ? "" : "bg-gray-50/30"}`}>
-                  <td className="px-5 py-3.5">
-                    <p className="font-medium text-gray-800">{lt.name}</p>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full bg-[#1a2e6f]/10 text-[#1a2e6f]">
-                      {lt.categoryName}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    {lt.description ? (
-                      <span className="text-xs text-gray-500">{lt.description}</span>
-                    ) : (
-                      <span className="text-xs text-gray-300 italic">Tidak ada</span>
-                    )}
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <div className="flex items-center justify-end gap-2">
-                      <Link
-                        href={`/admin/jenis-surat/${lt.id}`}
-                        className="p-2 rounded-lg text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 transition"
-                        title="Lihat Detail"
-                      >
-                        <Eye size={15} />
-                      </Link>
-                      <Link
-                        href={`/admin/jenis-surat/${lt.id}/edit`}
-                        className="p-2 rounded-lg text-gray-400 hover:text-[#1a2e6f] hover:bg-[#1a2e6f]/10 transition"
-                        title="Edit"
-                      >
-                        <Pencil size={15} />
-                      </Link>
-                      <button
-                        onClick={() => setDeleteTarget(lt)}
-                        className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
-                        title="Hapus"
-                      >
-                        <Trash2 size={15} />
-                      </button>
-                    </div>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[800px]">
+              <thead>
+                <tr className="border-b border-gray-100 text-left">
+                  <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Nama Surat</th>
+                  <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Kategori</th>
+                  <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Deskripsi</th>
+                  <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide text-right">Aksi</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {allLetterTypes.map((lt, i) => (
+                  <tr key={lt.id} className={`border-b border-gray-50 hover:bg-gray-50/50 transition ${i % 2 === 0 ? "" : "bg-gray-50/30"}`}>
+                    <td className="px-5 py-3.5">
+                      <p className="font-medium text-gray-800">{lt.name}</p>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full bg-[#1a2e6f]/10 text-[#1a2e6f]">
+                        {lt.categoryName}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3.5">
+                      {lt.description ? (
+                        <span className="text-xs text-gray-500">{lt.description}</span>
+                      ) : (
+                        <span className="text-xs text-gray-300 italic">Tidak ada</span>
+                      )}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <div className="flex items-center justify-end gap-2">
+                        <Link
+                          href={`/admin/jenis-surat/${lt.id}`}
+                          className="p-2 rounded-lg text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 transition"
+                          title="Lihat Detail"
+                        >
+                          <Eye size={15} />
+                        </Link>
+                        <Link
+                          href={`/admin/jenis-surat/${lt.id}/edit`}
+                          className="p-2 rounded-lg text-gray-400 hover:text-[#1a2e6f] hover:bg-[#1a2e6f]/10 transition"
+                          title="Edit"
+                        >
+                          <Pencil size={15} />
+                        </Link>
+                        <button
+                          onClick={() => setDeleteTarget(lt)}
+                          className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
+                          title="Hapus"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 

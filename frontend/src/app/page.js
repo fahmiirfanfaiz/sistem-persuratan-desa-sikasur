@@ -252,19 +252,19 @@ export default function LandingPage() {
                 Jam Pelayanan
               </p>
               <p className="text-xs text-gray-400 leading-relaxed">
-                Senin s.d. Kamis : 08.00 – 15.00 WIB
+                Senin s.d. Kamis : 08.00 – 14.00 WIB
                 <br />
-                Jumat : 08.00 – 13.00 WIB
+                Jumat : 08.00 – 11.30 WIB
                 <br />
                 Sabtu, Minggu, dan Hari Libur Nasional : Libur
               </p>
             </div>
           </div>
 
-          {/* Social Media */}
+          {/* Media Sosial */}
           <div>
             <p className="text-xs font-bold text-white uppercase tracking-widest mb-4">
-              Social Media
+              Media Sosial
             </p>
             <div className="flex items-center gap-4">
               <a
@@ -280,9 +280,9 @@ export default function LandingPage() {
 
         {/* Bottom bar */}
         <div className="border-t border-white/10 py-4 text-center text-[11px] text-gray-500">
-          Developed by{" "}
+          Dikembangkan oleh{" "}
           <span className="font-semibold text-gray-400">
-            KKN-PPM UGM Gemercik Belik Periode 2 2026
+            Tim KKN-PPM UGM Gemercik Belik Periode 2 2026
           </span>
         </div>
       </footer>

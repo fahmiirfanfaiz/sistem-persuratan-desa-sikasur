@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -13,6 +13,8 @@ import {
   Eye,
   EyeOff,
   Loader2,
+  CreditCard,
+  IdCard,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
@@ -27,6 +29,8 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     namaLengkap: "",
+    nik: "",
+    nomorKK: "",
     email: "",
     nomorHandphone: "",
     alamat: "",
@@ -60,6 +64,8 @@ export default function RegisterPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.namaLengkap,
+          nik: formData.nik,
+          familyCardNumber: formData.nomorKK,
           email: formData.email,
           phoneNumber: formData.nomorHandphone,
           address: formData.alamat,
@@ -134,6 +140,58 @@ export default function RegisterPage() {
                 autoComplete="name"
                 placeholder="John Doe"
                 value={formData.namaLengkap}
+                onChange={handleChange}
+                className="pl-10 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
+                required
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+
+          {/* NIK */}
+          <div>
+            <label
+              htmlFor="nik"
+              className="block text-sm font-medium text-gray-700 mb-1.5"
+            >
+              NIK
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-gray-400">
+                <IdCard size={18} strokeWidth={1.8} />
+              </span>
+              <Input
+                id="nik"
+                name="nik"
+                type="text"
+                placeholder="3327..."
+                value={formData.nik}
+                onChange={handleChange}
+                className="pl-10 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
+                required
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+
+          {/* Nomor KK */}
+          <div>
+            <label
+              htmlFor="nomorKK"
+              className="block text-sm font-medium text-gray-700 mb-1.5"
+            >
+              Nomor Kartu Keluarga
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-gray-400">
+                <CreditCard size={18} strokeWidth={1.8} />
+              </span>
+              <Input
+                id="nomorKK"
+                name="nomorKK"
+                type="text"
+                placeholder="3327..."
+                value={formData.nomorKK}
                 onChange={handleChange}
                 className="pl-10 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
                 required
