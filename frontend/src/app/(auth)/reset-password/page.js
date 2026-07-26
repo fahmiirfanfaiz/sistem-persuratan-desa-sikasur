@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -10,6 +10,14 @@ import { Input } from "@/components/ui/input";
 import { apiFetch } from "@/lib/api";
 
 export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#f5f6fa] flex items-center justify-center p-4"><Loader2 className="animate-spin text-[#1a2e6f]" size={32} /></div>}>
+      <ResetPasswordContent />
+    </Suspense>
+  );
+}
+
+function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
