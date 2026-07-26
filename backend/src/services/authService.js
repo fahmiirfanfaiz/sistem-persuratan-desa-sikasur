@@ -189,7 +189,7 @@ const forgotPassword = async (email) => {
     expiresIn: "15m", // 15 minutes expiration
   });
 
-  const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+  const resetLink = `https://persuratan-sikasur.vercel.app/reset-password?token=${token}`;
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -237,14 +237,14 @@ const resetPassword = async (token, newPassword) => {
   });
 
   // Send confirmation email
-  const loginLink = `http://localhost:3000/login`;
+  const loginLink = `https://persuratan-sikasur.vercel.app/forgot-password`;
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #333;">Konfirmasi Perubahan Password</h2>
       <p>Password Anda untuk Sistem Persuratan Digital Desa Sikasur telah diubah.</p>
       <p>Jika Anda tidak meminta perubahan kata sandi, Anda dapat mengatur ulang password Anda di sini:</p>
       <p style="margin: 20px 0;">
-        <a href="${loginLink}" style="background-color: #dc3545; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">Masuk</a>
+        <a href="${loginLink}" style="background-color: #dc3545; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">Reset Password</a>
       </p>
       <p style="color: #666; font-size: 14px;">Jika tautan tidak dapat diklik, coba salin dan tempel ke browser Anda:</p>
       <p style="color: #666; font-size: 14px;">${loginLink}</p>
