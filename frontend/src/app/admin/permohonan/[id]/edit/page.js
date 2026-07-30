@@ -14,6 +14,9 @@ import {
   User,
   Loader2,
   AlertCircle,
+  Eye,
+  X,
+  FileImage,
 } from "lucide-react";
 
 function formatDate(iso) {
@@ -40,6 +43,56 @@ const STATUS_BADGE = {
   COMPLETED: { label: "Selesai", cls: "bg-violet-50 text-violet-600 border-violet-200", icon: CheckCircle2 },
 };
 
+function PreviewModal({ isOpen, onClose, url, title, isPdf }) {
+  if (!isOpen) return null;
+
+  // Handle .docx fallback
+  const isDocx = url?.toLowerCase().includes('.docx') || url?.toLowerCase().includes('.doc');
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-[2px] p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+          <div className="flex items-center gap-2">
+            {isPdf ? <FileText size={16} className="text-[#1a2e6f]" /> : <FileImage size={16} className="text-[#1a2e6f]" />}
+            <p className="text-sm font-semibold text-gray-800">{title}</p>
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition">
+            <X size={18} />
+          </button>
+        </div>
+        <div className="flex-1 overflow-auto bg-gray-50 min-h-[400px] flex items-center justify-center">
+          {isDocx ? (
+            <div className="flex flex-col items-center p-8 text-center">
+              <FileText size={48} className="text-gray-400 mb-4" />
+              <p className="text-sm font-semibold text-gray-700">File Word tidak dapat dipratinjau secara langsung.</p>
+              <p className="text-xs text-gray-500 mt-1">Silakan unduh file untuk melihatnya.</p>
+            </div>
+          ) : isPdf ? (
+            <iframe src={url} title={title} className="w-full h-full min-h-[500px]" style={{ border: 'none' }} />
+          ) : (
+            <img src={url} alt={title} className="max-w-full max-h-[70vh] object-contain rounded-lg" />
+          )}
+        </div>
+        <div className="flex justify-end gap-2 px-5 py-3 border-t border-gray-100">
+          <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+            Tutup
+          </button>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#1a2e6f] hover:bg-[#152460] rounded-lg transition"
+          >
+            <Download size={13} />
+            Buka di Tab Baru
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function EditPermohonanPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -56,8 +109,9 @@ export default function EditPermohonanPage() {
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState({ type: "", text: "" });
 
-  // Download states
-  const [downloadingDoc, setDownloadingDoc] = useState(null);
+  // Preview states
+  const [previewingDoc, setPreviewingDoc] = useState(null);
+  const [previewData, setPreviewData] = useState({ isOpen: false, url: null, title: "", isPdf: false });
   const [downloadingTemplate, setDownloadingTemplate] = useState(false);
 
   useEffect(() => {
@@ -82,20 +136,25 @@ export default function EditPermohonanPage() {
     if (id) fetchDetail();
   }, [id]);
 
-  const handleDownloadDoc = async (docId, docType) => {
-    setDownloadingDoc(docId);
+  const handlePreviewDoc = async (docId, docType, docPath) => {
+    setPreviewingDoc(docId);
     try {
       const res = await apiFetch(`/api/admin/submissions/${id}/documents/${docId}/download`);
       const json = await res.json();
-      if (json.success) {
-        window.location.href = json.data.url;
+      if (json.success && json.data?.url) {
+        setPreviewData({
+          isOpen: true,
+          url: json.data.url,
+          title: docType === "KARTU_KELUARGA" ? "Kartu Keluarga (KK)" : "KTP",
+          isPdf: docPath?.toLowerCase().endsWith(".pdf")
+        });
       } else {
-        alert(json.message || "Gagal mendapatkan link unduhan");
+        alert(json.message || "Gagal mendapatkan link dokumen");
       }
     } catch {
       alert("Gagal terhubung ke server");
     } finally {
-      setDownloadingDoc(null);
+      setPreviewingDoc(null);
     }
   };
 
@@ -253,43 +312,46 @@ export default function EditPermohonanPage() {
         </div>
 
         <div className="flex flex-col gap-3">
-          {submission.documents?.map((doc, idx) => (
-            <div
-              key={doc.id}
-              className="flex items-center justify-between bg-gray-50 rounded-xl border border-gray-200 px-4 py-3"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-md bg-gray-200 flex items-center justify-center flex-shrink-0 text-xs font-bold text-gray-500">
-                  {idx + 1}
-                </div>
-                <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0">
-                  <FileText size={14} className="text-red-400" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">{docType(doc.documentType)}</p>
-                  <p className="text-sm font-medium text-gray-700">
-                    {docType(doc.documentType)}_{submission.user?.name}.jpg
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => handleDownloadDoc(doc.id, doc.documentType)}
-                disabled={downloadingDoc === doc.id}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-[#1a2e6f] border border-[#1a2e6f]/30 rounded-lg hover:bg-[#1a2e6f]/5 transition disabled:opacity-60"
+          {submission.documents?.map((doc, idx) => {
+            const isDocPdf = doc.storagePath?.toLowerCase().endsWith('.pdf');
+            return (
+              <div
+                key={doc.id}
+                className="flex items-center justify-between bg-gray-50 rounded-xl border border-gray-200 px-4 py-3"
               >
-                {downloadingDoc === doc.id ? (
-                  <Loader2 size={12} className="animate-spin" />
-                ) : (
-                  <Download size={12} />
-                )}
-                Unduh
-              </button>
-            </div>
-          ))}
+                <div className="flex items-center gap-3">
+                  <div className="w-6 h-6 rounded-md bg-gray-200 flex items-center justify-center flex-shrink-0 text-xs font-bold text-gray-500">
+                    {idx + 1}
+                  </div>
+                  <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0">
+                    {isDocPdf ? <FileText size={14} className="text-red-400" /> : <FileImage size={14} className="text-[#1a2e6f]" />}
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">{docType(doc.documentType)}</p>
+                    <p className="text-sm font-medium text-gray-700">
+                      {docType(doc.documentType)}_{submission.user?.name}.{isDocPdf ? "pdf" : "jpg"}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handlePreviewDoc(doc.id, doc.documentType, doc.storagePath)}
+                  disabled={previewingDoc === doc.id}
+                  className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-[#1a2e6f] border border-[#1a2e6f]/30 rounded-lg hover:bg-[#1a2e6f]/5 transition disabled:opacity-60 bg-white shadow-sm"
+                >
+                  {previewingDoc === doc.id ? (
+                    <Loader2 size={13} className="animate-spin" />
+                  ) : (
+                    <Eye size={13} />
+                  )}
+                  Lihat
+                </button>
+              </div>
+            );
+          })}
 
           {/* Template Download */}
           {submission.letterType?.templatePath && (
-            <div className="flex items-center justify-between bg-blue-50 rounded-xl border border-blue-200 px-4 py-3">
+            <div className="flex items-center justify-between bg-blue-50 rounded-xl border border-blue-200 px-4 py-3 mt-2">
               <div className="flex items-center gap-3">
                 <div className="w-6 h-6 rounded-md bg-gray-200 flex items-center justify-center flex-shrink-0 text-xs font-bold text-gray-500">
                   {(submission.documents?.length || 0) + 1}
@@ -305,12 +367,12 @@ export default function EditPermohonanPage() {
               <button
                 onClick={handleDownloadTemplate}
                 disabled={downloadingTemplate}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-100 transition disabled:opacity-60"
+                className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-100 transition disabled:opacity-60 bg-white shadow-sm"
               >
                 {downloadingTemplate ? (
-                  <Loader2 size={12} className="animate-spin" />
+                  <Loader2 size={13} className="animate-spin" />
                 ) : (
-                  <Download size={12} />
+                  <Download size={13} />
                 )}
                 Unduh Template
               </button>
@@ -414,6 +476,14 @@ export default function EditPermohonanPage() {
           </div>
         </div>
       </div>
+      
+      <PreviewModal
+        isOpen={previewData.isOpen}
+        onClose={() => setPreviewData({ ...previewData, isOpen: false })}
+        url={previewData.url}
+        title={previewData.title}
+        isPdf={previewData.isPdf}
+      />
     </div>
   );
 }

@@ -280,9 +280,11 @@ const getDocumentSignedUrl = async (submissionId, documentId) => {
 
   const prefix = doc.documentType === "KARTU_KELUARGA" ? "KK" : "KTP";
   const userName = doc.submission?.user?.name || "Pengguna";
-  const downloadName = `${prefix}_${userName}.jpg`;
+  const ext = doc.storagePath.split(".").pop() || "jpg";
+  const downloadName = `${prefix}_${userName}.${ext}`;
 
-  const url = await getSignedDownloadUrl(doc.storagePath, BUCKET_NAME, 300, true, downloadName);
+  // Use asAttachment = false so browsers can preview pdfs and images natively
+  const url = await getSignedDownloadUrl(doc.storagePath, BUCKET_NAME, 300, false, downloadName);
   return url;
 };
 

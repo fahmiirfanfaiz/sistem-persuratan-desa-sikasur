@@ -82,6 +82,10 @@ function SectionCard({ title, icon: Icon, children }) {
 
 function PreviewModal({ isOpen, onClose, url, title, isPdf }) {
   if (!isOpen) return null;
+
+  // Handle .docx fallback (since S3 url might have it in the path)
+  const isDocx = url?.toLowerCase().includes('.docx') || url?.toLowerCase().includes('.doc');
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-[2px] p-4" onClick={onClose}>
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
@@ -95,7 +99,13 @@ function PreviewModal({ isOpen, onClose, url, title, isPdf }) {
           </button>
         </div>
         <div className="flex-1 overflow-auto bg-gray-50 min-h-[400px] flex items-center justify-center">
-          {isPdf ? (
+          {isDocx ? (
+            <div className="flex flex-col items-center p-8 text-center">
+              <FileText size={48} className="text-gray-400 mb-4" />
+              <p className="text-sm font-semibold text-gray-700">File Word tidak dapat dipratinjau secara langsung.</p>
+              <p className="text-xs text-gray-500 mt-1">Silakan unduh file untuk melihatnya.</p>
+            </div>
+          ) : isPdf ? (
             <iframe src={url} title={title} className="w-full h-full min-h-[500px]" style={{ border: 'none' }} />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element

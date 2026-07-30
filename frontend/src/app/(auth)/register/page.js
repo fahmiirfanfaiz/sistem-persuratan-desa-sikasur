@@ -185,7 +185,7 @@ export default function RegisterPage() {
                 type="text"
                 inputMode="numeric"
                 maxLength={16}
-                placeholder="3327... (16 digit)"
+                placeholder="3301010101010001"
                 value={formData.nik}
                 onChange={handleNumericChange}
                 className="pl-10 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
@@ -213,7 +213,7 @@ export default function RegisterPage() {
                 type="text"
                 inputMode="numeric"
                 maxLength={16}
-                placeholder="3327... (16 digit)"
+                placeholder="3301011203456789"
                 value={formData.nomorKK}
                 onChange={handleNumericChange}
                 className="pl-10 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
@@ -266,10 +266,11 @@ export default function RegisterPage() {
                 id="nomorHandphone"
                 name="nomorHandphone"
                 type="tel"
+                inputMode="numeric"
                 autoComplete="tel"
                 placeholder="082328775373"
                 value={formData.nomorHandphone}
-                onChange={handleChange}
+                onChange={handleNumericChange}
                 className="pl-10 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
                 required
                 disabled={isLoading}

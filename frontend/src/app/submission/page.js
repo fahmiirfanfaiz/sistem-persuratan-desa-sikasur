@@ -106,18 +106,10 @@ function DocumentUploadZone({ label, file, onFileChange, onRemove, id }) {
       <div className="flex gap-2 mt-2">
         <button
           type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-        >
-          <FolderOpen size={14} />
-          Pilih File
-        </button>
-        <button
-          type="button"
           onClick={() => cameraInputRef.current?.click()}
-          className="flex-1 md:hidden flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-[#1a2e6f] bg-[#1a2e6f]/10 border border-[#1a2e6f]/30 rounded-lg hover:bg-[#1a2e6f]/20 transition"
+          className="flex-1 md:hidden flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1a2e6f]/10 text-[#1a2e6f] font-semibold text-sm rounded-xl hover:bg-[#1a2e6f]/20 transition border border-[#1a2e6f]/20"
         >
-          <Camera size={14} />
+          <Camera size={16} />
           Ambil Foto
         </button>
       </div>
