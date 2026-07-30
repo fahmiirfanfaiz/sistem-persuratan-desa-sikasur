@@ -1,5 +1,4 @@
 import prisma from "../libs/prisma.js";
-import bcrypt from "bcrypt";
 
 class ClientError extends Error {
   constructor(message, statusCode = 400) {
@@ -137,7 +136,7 @@ const getUserById = async (userId) => {
  * Update a user (admin).
  */
 const updateUser = async (userId, data) => {
-  const { name, email, phoneNumber, address, role, isActive, password } = data;
+  const { name, email, phoneNumber, address, role, isActive, nik, familyCardNumber } = data;
 
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new ClientError("Pengguna tidak ditemukan", 404);
@@ -149,7 +148,16 @@ const updateUser = async (userId, data) => {
   if (address) updateData.address = address.trim();
   if (role && ["ADMIN", "USER"].includes(role)) updateData.role = role;
   if (typeof isActive === "boolean") updateData.isActive = isActive;
-  if (password) updateData.password = await bcrypt.hash(password, 12);
+  // NIK: hanya angka, 16 digit
+  if (nik !== undefined) {
+    if (nik !== "" && !/^\d{16}$/.test(nik)) throw new ClientError("NIK harus berupa 16 digit angka");
+    updateData.nik = nik || null;
+  }
+  // No KK: hanya angka, 16 digit
+  if (familyCardNumber !== undefined) {
+    if (familyCardNumber !== "" && !/^\d{16}$/.test(familyCardNumber)) throw new ClientError("Nomor KK harus berupa 16 digit angka");
+    updateData.familyCardNumber = familyCardNumber || null;
+  }
 
   return prisma.user.update({
     where: { id: userId },
@@ -159,6 +167,7 @@ const updateUser = async (userId, data) => {
       name: true,
       email: true,
       nik: true,
+      familyCardNumber: true,
       phoneNumber: true,
       address: true,
       role: true,

@@ -43,6 +43,13 @@ export default function RegisterPage() {
     if (error) setError("");
   };
 
+  // Handler khusus untuk field numerik (NIK & No KK) — hanya terima angka
+  const handleNumericChange = (e) => {
+    const digits = e.target.value.replace(/\D/g, "");
+    setFormData({ ...formData, [e.target.name]: digits });
+    if (error) setError("");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -54,6 +61,18 @@ export default function RegisterPage() {
 
     if (formData.password.length < 8) {
       setError("Password minimal 8 karakter.");
+      return;
+    }
+
+    // Validasi NIK: harus 16 digit angka
+    if (!formData.nik || formData.nik.length !== 16) {
+      setError("NIK harus 16 digit angka.");
+      return;
+    }
+
+    // Validasi No KK: harus 16 digit angka
+    if (!formData.nomorKK || formData.nomorKK.length !== 16) {
+      setError("Nomor Kartu Keluarga harus 16 digit angka.");
       return;
     }
 
@@ -164,9 +183,11 @@ export default function RegisterPage() {
                 id="nik"
                 name="nik"
                 type="text"
-                placeholder="3327..."
+                inputMode="numeric"
+                maxLength={16}
+                placeholder="3327... (16 digit)"
                 value={formData.nik}
-                onChange={handleChange}
+                onChange={handleNumericChange}
                 className="pl-10 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
                 required
                 disabled={isLoading}
@@ -190,9 +211,11 @@ export default function RegisterPage() {
                 id="nomorKK"
                 name="nomorKK"
                 type="text"
-                placeholder="3327..."
+                inputMode="numeric"
+                maxLength={16}
+                placeholder="3327... (16 digit)"
                 value={formData.nomorKK}
-                onChange={handleChange}
+                onChange={handleNumericChange}
                 className="pl-10 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
                 required
                 disabled={isLoading}
@@ -233,7 +256,7 @@ export default function RegisterPage() {
               htmlFor="nomorHandphone"
               className="block text-sm font-medium text-gray-700 mb-1.5"
             >
-              Nomor Handphone
+              Nomor WhatsApp
             </label>
             <div className="relative">
               <span className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-gray-400">

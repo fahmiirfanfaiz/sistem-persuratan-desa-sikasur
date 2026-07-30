@@ -9,14 +9,14 @@ const router = Router();
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 2 * 1024 * 1024, // 2 MB per file
+    fileSize: 5 * 1024 * 1024, // 5 MB per file
   },
   fileFilter: (_req, file, cb) => {
-    const allowed = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+    const allowed = ["image/jpeg", "image/png", "image/webp", "image/jpg", "application/pdf"];
     if (allowed.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error("Hanya format gambar (JPEG/PNG/WEBP) yang diperbolehkan"));
+      cb(new Error("Hanya format gambar (JPEG/PNG/WEBP) atau PDF yang diperbolehkan"));
     }
   },
 });

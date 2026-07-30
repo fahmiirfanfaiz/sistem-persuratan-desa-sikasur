@@ -1,28 +1,32 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { apiFetch } from "@/lib/api";
-import { ArrowLeft, Loader2, AlertCircle } from "lucide-react";
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { apiFetch } from '@/lib/api';
+import { ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
+
+function onlyDigits(value) {
+  return value.replace(/\D/g, '');
+}
 
 export default function EditPenggunaPage() {
   const { id } = useParams();
   const router = useRouter();
-
   const [loadingInitial, setLoadingInitial] = useState(true);
-  const [errorInitial, setErrorInitial] = useState("");
-
+  const [errorInitial, setErrorInitial] = useState('');
   const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phoneNumber: "",
-    address: "",
-    role: "USER",
+    name: '',
+    email: '',
+    nik: '',
+    familyCardNumber: '',
+    phoneNumber: '',
+    address: '',
+    role: 'USER',
     isActive: true,
-    password: "",
   });
+  const [fieldErrors, setFieldErrors] = useState({ nik: '', familyCardNumber: '' });
   const [loadingSave, setLoadingSave] = useState(false);
-  const [errorSave, setErrorSave] = useState("");
+  const [errorSave, setErrorSave] = useState('');
 
   useEffect(() => {
     const fetchInit = async () => {
@@ -33,19 +37,20 @@ export default function EditPenggunaPage() {
         if (json.success) {
           const data = json.data;
           setForm({
-            name: data.name ?? "",
-            email: data.email ?? "",
-            phoneNumber: data.phoneNumber ?? "",
-            address: data.address ?? "",
-            role: data.role ?? "USER",
+            name: data.name ?? '',
+            email: data.email ?? '',
+            nik: data.nik ?? '',
+            familyCardNumber: data.familyCardNumber ?? '',
+            phoneNumber: data.phoneNumber ?? '',
+            address: data.address ?? '',
+            role: data.role ?? 'USER',
             isActive: data.isActive ?? true,
-            password: "",
           });
         } else {
-          setErrorInitial("Gagal memuat data pengguna");
+          setErrorInitial('Gagal memuat data pengguna');
         }
       } catch {
-        setErrorInitial("Gagal terhubung ke server");
+        setErrorInitial('Gagal terhubung ke server');
       } finally {
         setLoadingInitial(false);
       }
@@ -53,26 +58,43 @@ export default function EditPenggunaPage() {
     if (id) fetchInit();
   }, [id]);
 
+  const handleNumericChange = (e) => {
+    const { name, value } = e.target;
+    const digits = onlyDigits(value);
+    setForm((p) => ({ ...p, [name]: digits }));
+    if (digits.length > 0 && digits.length < 16) {
+      setFieldErrors((prev) => ({ ...prev, [name]: 'Harus 16 digit' }));
+    } else {
+      setFieldErrors((prev) => ({ ...prev, [name]: '' }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (form.nik && form.nik.length !== 16) {
+      setFieldErrors((prev) => ({ ...prev, nik: 'NIK harus 16 digit angka' }));
+      return;
+    }
+    if (form.familyCardNumber && form.familyCardNumber.length !== 16) {
+      setFieldErrors((prev) => ({ ...prev, familyCardNumber: 'Nomor KK harus 16 digit angka' }));
+      return;
+    }
     setLoadingSave(true);
-    setErrorSave("");
+    setErrorSave('');
     try {
-      const body = { ...form };
-      if (!body.password) delete body.password;
       const res = await apiFetch(`/api/admin/users/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
       });
       const json = await res.json();
       if (!res.ok) {
-        setErrorSave(json.message || "Terjadi kesalahan");
+        setErrorSave(json.message || 'Terjadi kesalahan');
         return;
       }
-      router.push("/admin/pengguna");
+      router.push('/admin/pengguna');
     } catch {
-      setErrorSave("Gagal terhubung ke server");
+      setErrorSave('Gagal terhubung ke server');
     } finally {
       setLoadingSave(false);
     }
@@ -104,7 +126,7 @@ export default function EditPenggunaPage() {
   return (
     <div className="max-w-2xl">
       <button
-        onClick={() => router.push("/admin/pengguna")}
+        onClick={() => router.push('/admin/pengguna')}
         className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#1a2e6f] transition mb-5"
       >
         <ArrowLeft size={16} />
@@ -144,6 +166,37 @@ export default function EditPenggunaPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">NIK</label>
+              <input
+                type="text"
+                name="nik"
+                inputMode="numeric"
+                maxLength={16}
+                placeholder="16 digit angka"
+                value={form.nik}
+                onChange={handleNumericChange}
+                className={`w-full h-11 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f] ${fieldErrors.nik ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
+              />
+              {fieldErrors.nik && <p className="mt-1 text-xs text-red-600">{fieldErrors.nik}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Nomor KK</label>
+              <input
+                type="text"
+                name="familyCardNumber"
+                inputMode="numeric"
+                maxLength={16}
+                placeholder="16 digit angka"
+                value={form.familyCardNumber}
+                onChange={handleNumericChange}
+                className={`w-full h-11 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f] ${fieldErrors.familyCardNumber ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
+              />
+              {fieldErrors.familyCardNumber && <p className="mt-1 text-xs text-red-600">{fieldErrors.familyCardNumber}</p>}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">No Telepon</label>
               <input
                 type="tel"
@@ -175,50 +228,26 @@ export default function EditPenggunaPage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Password Baru <span className="text-gray-400">(kosongkan jika tidak diubah)</span>
-              </label>
-              <input
-                type="password"
-                value={form.password}
-                onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
-                placeholder="••••••••"
-                className="w-full h-11 px-3 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f]"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Status Akun</label>
-              <div className="flex items-center gap-3 h-11">
-                <button
-                  type="button"
-                  onClick={() => setForm((p) => ({ ...p, isActive: !p.isActive }))}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                    form.isActive ? "bg-[#1a2e6f]" : "bg-gray-300"
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
-                      form.isActive ? "translate-x-6" : "translate-x-1"
-                    }`}
-                  />
-                </button>
-                <span
-                  className={`text-sm font-medium ${
-                    form.isActive ? "text-emerald-600" : "text-gray-400"
-                  }`}
-                >
-                  {form.isActive ? "Aktif" : "Non-aktif"}
-                </span>
-              </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Status Akun</label>
+            <div className="flex items-center gap-3 h-11">
+              <button
+                type="button"
+                onClick={() => setForm((p) => ({ ...p, isActive: !p.isActive }))}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${form.isActive ? 'bg-[#1a2e6f]' : 'bg-gray-300'}`}
+              >
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${form.isActive ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+              <span className={`text-sm font-medium ${form.isActive ? 'text-emerald-600' : 'text-gray-400'}`}>
+                {form.isActive ? 'Aktif' : 'Non-aktif'}
+              </span>
             </div>
           </div>
 
           <div className="flex justify-end gap-3 mt-4">
             <button
               type="button"
-              onClick={() => router.push("/admin/pengguna")}
+              onClick={() => router.push('/admin/pengguna')}
               className="px-5 py-2.5 text-sm font-semibold text-gray-700 border border-gray-300 rounded-xl hover:bg-gray-50 transition"
             >
               Batal

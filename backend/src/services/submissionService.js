@@ -19,7 +19,15 @@ class ClientError extends Error {
  * Uploads a single file buffer to Supabase S3.
  */
 const uploadToS3 = async (buffer, mimetype, folder) => {
-  const ext = mimetype.split("/")[1] || "jpg";
+  // Tentukan ekstensi file berdasarkan MIME type
+  const mimeToExt = {
+    "image/jpeg": "jpg",
+    "image/jpg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "application/pdf": "pdf",
+  };
+  const ext = mimeToExt[mimetype] || mimetype.split("/")[1] || "bin";
   const key = `${folder}/${randomUUID()}.${ext}`;
 
   await s3Client.send(

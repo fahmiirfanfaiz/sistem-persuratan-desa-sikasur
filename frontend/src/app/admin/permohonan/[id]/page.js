@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
-import { apiFetch } from "@/lib/api";
+import { useState, useEffect, useCallback } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { apiFetch } from '@/lib/api';
 import {
   ArrowLeft,
   User,
@@ -12,6 +12,8 @@ import {
   Loader2,
   AlertCircle,
   Download,
+  Eye,
+  X,
   Pencil,
   Phone,
   Mail,
@@ -21,27 +23,22 @@ import {
   XCircle,
   RefreshCw,
   FileCheck,
-} from "lucide-react";
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+  FileImage,
+} from 'lucide-react';
 
 function formatDate(iso) {
-  if (!iso) return "-";
-  return new Intl.DateTimeFormat("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+  if (!iso) return '-';
+  return new Intl.DateTimeFormat('id-ID', {
+    day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
   }).format(new Date(iso));
 }
 
 const STATUS_CONFIG = {
-  PENDING: { label: "Menunggu", cls: "bg-amber-50 text-amber-600 border-amber-200", icon: Clock },
-  ON_PROCESS: { label: "Diproses", cls: "bg-blue-50 text-blue-600 border-blue-200", icon: RefreshCw },
-  APPROVED: { label: "Disetujui", cls: "bg-emerald-50 text-emerald-600 border-emerald-200", icon: CheckCircle2 },
-  REJECTED: { label: "Ditolak", cls: "bg-red-50 text-red-600 border-red-200", icon: XCircle },
-  COMPLETED: { label: "Selesai", cls: "bg-violet-50 text-violet-600 border-violet-200", icon: FileCheck },
+  PENDING: { label: 'Menunggu', cls: 'bg-amber-50 text-amber-600 border-amber-200', icon: Clock },
+  ON_PROCESS: { label: 'Diproses', cls: 'bg-blue-50 text-blue-600 border-blue-200', icon: RefreshCw },
+  APPROVED: { label: 'Disetujui', cls: 'bg-emerald-50 text-emerald-600 border-emerald-200', icon: CheckCircle2 },
+  REJECTED: { label: 'Ditolak', cls: 'bg-red-50 text-red-600 border-red-200', icon: XCircle },
+  COMPLETED: { label: 'Selesai', cls: 'bg-violet-50 text-violet-600 border-violet-200', icon: FileCheck },
 };
 
 function StatusBadge({ status }) {
@@ -63,7 +60,7 @@ function InfoRow({ icon: Icon, label, value }) {
       </div>
       <div className="min-w-0">
         <p className="text-xs text-gray-400 mb-0.5">{label}</p>
-        <p className="text-sm font-medium text-gray-800 break-words">{value || "-"}</p>
+        <p className="text-sm font-medium text-gray-800 break-words">{value || '-'}</p>
       </div>
     </div>
   );
@@ -83,134 +80,221 @@ function SectionCard({ title, icon: Icon, children }) {
   );
 }
 
+function PreviewModal({ isOpen, onClose, url, title, isPdf }) {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-[2px] p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+          <div className="flex items-center gap-2">
+            {isPdf ? <FileText size={16} className="text-[#1a2e6f]" /> : <FileImage size={16} className="text-[#1a2e6f]" />}
+            <p className="text-sm font-semibold text-gray-800">{title}</p>
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition">
+            <X size={18} />
+          </button>
+        </div>
+        <div className="flex-1 overflow-auto bg-gray-50 min-h-[400px] flex items-center justify-center">
+          {isPdf ? (
+            <iframe src={url} title={title} className="w-full h-full min-h-[500px]" style={{ border: 'none' }} />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={url} alt={title} className="max-w-full max-h-[70vh] object-contain rounded-lg" />
+          )}
+        </div>
+        <div className="flex justify-end gap-2 px-5 py-3 border-t border-gray-100">
+          <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+            Tutup
+          </button>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#1a2e6f] hover:bg-[#152460] rounded-lg transition"
+          >
+            <Download size={13} />
+            Buka di Tab Baru
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function DocumentRow({ submissionId, doc }) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
 
-  const LABEL = { KARTU_KELUARGA: "Kartu Keluarga (KK)", KTP: "KTP" };
+  const LABEL = { KARTU_KELUARGA: 'Kartu Keluarga (KK)', KTP: 'KTP' };
 
-  const handleDownload = async () => {
+  const handlePreview = async () => {
+    if (previewUrl) { setShowPreview(true); return; }
     setLoading(true);
-    setError("");
+    setError('');
     try {
       const res = await apiFetch(`/api/admin/submissions/${submissionId}/documents/${doc.id}/download`);
       const json = await res.json();
       if (json.success && json.data?.url) {
-        window.open(json.data.url, "_blank");
+        setPreviewUrl(json.data.url);
+        setShowPreview(true);
       } else {
-        setError(json.message || "Gagal mendapatkan link unduhan");
+        setError(json.message || 'Gagal mendapatkan dokumen');
       }
     } catch {
-      setError("Gagal terhubung ke server");
+      setError('Gagal terhubung ke server');
     } finally {
       setLoading(false);
     }
   };
 
+  const isPdf = doc.storagePath?.toLowerCase().endsWith('.pdf');
+
   return (
-    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl gap-3">
-      <div className="flex items-center gap-3 min-w-0">
-        <div className="w-9 h-9 rounded-lg bg-white border border-gray-200 flex items-center justify-center flex-shrink-0 shadow-sm">
-          <FileText size={16} className="text-[#1a2e6f]" />
+    <>
+      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-lg bg-white border border-gray-200 flex items-center justify-center flex-shrink-0 shadow-sm">
+            {isPdf ? <FileText size={16} className="text-red-500" /> : <FileImage size={16} className="text-[#1a2e6f]" />}
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-gray-800">{LABEL[doc.documentType] ?? doc.documentType}</p>
+            <p className="text-xs text-gray-400">{formatDate(doc.createdAt)}</p>
+          </div>
         </div>
-        <div>
-          <p className="text-sm font-semibold text-gray-800">{LABEL[doc.documentType] ?? doc.documentType}</p>
-          <p className="text-xs text-gray-400">{formatDate(doc.createdAt)}</p>
+        <div className="flex-shrink-0">
+          {error && <p className="text-xs text-red-500 mb-1">{error}</p>}
+          <button
+            onClick={handlePreview}
+            disabled={loading}
+            className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-[#1a2e6f] bg-white border border-[#1a2e6f]/30 rounded-lg hover:bg-[#1a2e6f]/5 transition disabled:opacity-60"
+          >
+            {loading ? <Loader2 size={13} className="animate-spin" /> : <Eye size={13} />}
+            Lihat
+          </button>
         </div>
       </div>
-      <div className="flex-shrink-0">
-        {error && <p className="text-xs text-red-500 mb-1">{error}</p>}
-        <button
-          onClick={handleDownload}
-          disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-[#1a2e6f] bg-white border border-[#1a2e6f]/30 rounded-lg hover:bg-[#1a2e6f]/5 transition disabled:opacity-60"
-        >
-          {loading ? <Loader2 size={13} className="animate-spin" /> : <Download size={13} />}
-          Unduh
-        </button>
-      </div>
-    </div>
+      {showPreview && previewUrl && (
+        <PreviewModal
+          isOpen={showPreview}
+          onClose={() => setShowPreview(false)}
+          url={previewUrl}
+          title={LABEL[doc.documentType] ?? doc.documentType}
+          isPdf={isPdf}
+        />
+      )}
+    </>
   );
 }
 
 function GeneratedLetterRow({ submissionId, letter }) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
+  const [letterUrl, setLetterUrl] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
 
-  const handleDownload = async () => {
+  const fetchUrl = async () => {
+    if (letterUrl) return letterUrl;
     setLoading(true);
-    setError("");
+    setError('');
     try {
-      // Use the generated letter path via admin template download
       const res = await apiFetch(`/api/admin/submissions/${submissionId}/template/download`);
       const json = await res.json();
       if (json.success && json.data?.url) {
-        window.open(json.data.url, "_blank");
+        setLetterUrl(json.data.url);
+        return json.data.url;
       } else {
-        setError("Gagal mendapatkan link unduhan");
+        setError('Gagal mendapatkan link surat');
+        return null;
       }
     } catch {
-      setError("Gagal terhubung ke server");
+      setError('Gagal terhubung ke server');
+      return null;
     } finally {
       setLoading(false);
     }
   };
 
+  const handlePreview = async () => {
+    const url = await fetchUrl();
+    if (url) setShowPreview(true);
+  };
+
+  const handleDownload = async () => {
+    const url = await fetchUrl();
+    if (url) window.open(url, '_blank');
+  };
+
+  const isPdf = letter.path?.toLowerCase().endsWith('.pdf');
+
   return (
-    <div className="flex items-center justify-between p-4 bg-violet-50 rounded-xl gap-3 border border-violet-100">
-      <div className="flex items-center gap-3 min-w-0">
-        <div className="w-9 h-9 rounded-lg bg-white border border-violet-200 flex items-center justify-center flex-shrink-0 shadow-sm">
-          <FileCheck size={16} className="text-violet-600" />
+    <>
+      <div className="flex items-center justify-between p-4 bg-violet-50 rounded-xl gap-3 border border-violet-100">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-lg bg-white border border-violet-200 flex items-center justify-center flex-shrink-0 shadow-sm">
+            <FileCheck size={16} className="text-violet-600" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-gray-800">Surat yang Diterbitkan</p>
+            <p className="text-xs text-gray-400">
+              {formatDate(letter.createdAt)} ·{' '}
+              <span className={`font-medium ${letter.status === 'ISSUED' ? 'text-violet-600' : 'text-amber-600'}`}>
+                {letter.status === 'ISSUED' ? 'Diterbitkan' : 'Draft'}
+              </span>
+            </p>
+            {letter.letterNumber && <p className="text-xs text-gray-500 mt-0.5">No: {letter.letterNumber}</p>}
+          </div>
         </div>
-        <div>
-          <p className="text-sm font-semibold text-gray-800">Surat yang Diterbitkan</p>
-          <p className="text-xs text-gray-400">
-            {formatDate(letter.createdAt)} ·{" "}
-            <span className={`font-medium ${letter.status === "ISSUED" ? "text-violet-600" : "text-amber-600"}`}>
-              {letter.status === "ISSUED" ? "Diterbitkan" : "Draft"}
-            </span>
-          </p>
-          {letter.letterNumber && (
-            <p className="text-xs text-gray-500 mt-0.5">No: {letter.letterNumber}</p>
-          )}
+        <div className="flex-shrink-0">
+          {error && <p className="text-xs text-red-500 mb-1">{error}</p>}
+          <div className="flex gap-2">
+            <button
+              onClick={handlePreview}
+              disabled={loading}
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-violet-600 bg-white border border-violet-300 rounded-lg hover:bg-violet-50 transition disabled:opacity-60"
+            >
+              {loading ? <Loader2 size={12} className="animate-spin" /> : <Eye size={12} />}
+              Lihat
+            </button>
+            <button
+              onClick={handleDownload}
+              disabled={loading}
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-violet-600 bg-white border border-violet-300 rounded-lg hover:bg-violet-50 transition disabled:opacity-60"
+            >
+              {loading ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
+              Unduh
+            </button>
+          </div>
         </div>
       </div>
-      <div className="flex-shrink-0">
-        {error && <p className="text-xs text-red-500 mb-1">{error}</p>}
-        <button
-          onClick={handleDownload}
-          disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-violet-600 bg-white border border-violet-300 rounded-lg hover:bg-violet-50 transition disabled:opacity-60"
-        >
-          {loading ? <Loader2 size={13} className="animate-spin" /> : <Download size={13} />}
-          Unduh
-        </button>
-      </div>
-    </div>
+      {showPreview && letterUrl && (
+        <PreviewModal isOpen={showPreview} onClose={() => setShowPreview(false)} url={letterUrl} title="Surat yang Diterbitkan" isPdf={isPdf} />
+      )}
+    </>
   );
 }
 
-// ─── Main Page ─────────────────────────────────────────────────────────────────
 export default function DetailPermohonanPage() {
   const { id } = useParams();
   const router = useRouter();
   const [submission, setSubmission] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const fetchDetail = useCallback(async () => {
     setLoading(true);
-    setError("");
+    setError('');
     try {
       const res = await apiFetch(`/api/admin/submissions/${id}`);
       const json = await res.json();
       if (json.success) {
         setSubmission(json.data);
       } else {
-        setError(json.message || "Gagal memuat data");
+        setError(json.message || 'Gagal memuat data');
       }
     } catch {
-      setError("Gagal terhubung ke server");
+      setError('Gagal terhubung ke server');
     } finally {
       setLoading(false);
     }
@@ -233,10 +317,7 @@ export default function DetailPermohonanPage() {
       <div className="flex flex-col items-center py-24 text-center">
         <AlertCircle size={40} className="text-red-400 mb-3" />
         <p className="text-sm text-gray-500 mb-4">{error}</p>
-        <button
-          onClick={() => router.back()}
-          className="mt-2 px-4 py-2 text-sm font-semibold text-[#1a2e6f] border border-[#1a2e6f] rounded-lg hover:bg-[#1a2e6f]/5 transition"
-        >
+        <button onClick={() => router.back()} className="mt-2 px-4 py-2 text-sm font-semibold text-[#1a2e6f] border border-[#1a2e6f] rounded-lg hover:bg-[#1a2e6f]/5 transition">
           Kembali
         </button>
       </div>
@@ -247,22 +328,15 @@ export default function DetailPermohonanPage() {
 
   return (
     <div className="max-w-5xl">
-      {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-6 flex-wrap">
         <div>
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#1a2e6f] transition mb-3"
-          >
+          <button onClick={() => router.back()} className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#1a2e6f] transition mb-3">
             <ArrowLeft size={16} />
             Kembali
           </button>
           <h1 className="text-2xl font-bold text-gray-900">Detail Permohonan</h1>
           <p className="text-sm text-gray-500 mt-1">
-            ID:{" "}
-            <span className="font-mono text-xs bg-gray-100 px-2 py-0.5 rounded">
-              {submission.id}
-            </span>
+            ID: <span className="font-mono text-xs bg-gray-100 px-2 py-0.5 rounded">{submission.id}</span>
           </p>
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
@@ -277,28 +351,24 @@ export default function DetailPermohonanPage() {
         </div>
       </div>
 
-      {/* Grid Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Left — 2/3 */}
         <div className="lg:col-span-2 flex flex-col gap-5">
-
-          {/* Submission Info */}
           <SectionCard title="Informasi Pengajuan" icon={FileText}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <InfoRow icon={FileText} label="Jenis Surat" value={submission.letterType?.name} />
               <InfoRow icon={Clock} label="Tanggal Pengajuan" value={formatDate(submission.createdAt)} />
               <div className="sm:col-span-2">
                 <p className="text-xs text-gray-400 mb-1.5">Keperluan / Tujuan</p>
-                <p className="text-sm font-medium text-gray-800 bg-gray-50 rounded-xl p-4 leading-relaxed">
-                  {submission.purpose}
-                </p>
+                <p className="text-sm font-medium text-gray-800 bg-gray-50 rounded-xl p-4 leading-relaxed">{submission.purpose}</p>
               </div>
               <InfoRow icon={Clock} label="Terakhir Diperbarui" value={formatDate(submission.updatedAt)} />
             </div>
           </SectionCard>
 
-          {/* Documents */}
           <SectionCard title="Dokumen Persyaratan" icon={FileText}>
+            <p className="text-xs text-gray-400 mb-3">
+              Klik <span className="font-semibold">Lihat</span> untuk melihat dokumen KTP/KK. Dokumen hanya dapat dilihat, tidak dapat diunduh.
+            </p>
             {submission.documents?.length === 0 ? (
               <p className="text-sm text-gray-400 italic">Tidak ada dokumen.</p>
             ) : (
@@ -310,7 +380,6 @@ export default function DetailPermohonanPage() {
             )}
           </SectionCard>
 
-          {/* Generated Letters */}
           <SectionCard title="Surat yang Diterbitkan" icon={FileCheck}>
             {submission.generatedLetters?.length === 0 ? (
               <div className="flex flex-col items-center py-8 text-center">
@@ -318,9 +387,7 @@ export default function DetailPermohonanPage() {
                   <FileCheck size={22} className="text-gray-300" />
                 </div>
                 <p className="text-sm text-gray-400">Belum ada surat yang diterbitkan.</p>
-                <p className="text-xs text-gray-400 mt-1">
-                  Surat akan tersedia setelah status diubah ke &quot;Selesai&quot; dan file diunggah.
-                </p>
+                <p className="text-xs text-gray-400 mt-1">Surat akan tersedia setelah status diubah ke &quot;Selesai&quot; dan file diunggah.</p>
               </div>
             ) : (
               <div className="flex flex-col gap-3">
@@ -332,13 +399,12 @@ export default function DetailPermohonanPage() {
           </SectionCard>
         </div>
 
-        {/* Right — 1/3 */}
         <div className="flex flex-col gap-5">
           <SectionCard title="Data Pemohon" icon={User}>
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
                 <div className="w-12 h-12 rounded-full bg-[#1a2e6f] text-white text-lg font-bold flex items-center justify-center flex-shrink-0">
-                  {submission.user?.name?.charAt(0)?.toUpperCase() ?? "?"}
+                  {submission.user?.name?.charAt(0)?.toUpperCase() ?? '?'}
                 </div>
                 <div>
                   <p className="text-sm font-bold text-gray-900">{submission.user?.name}</p>
@@ -354,9 +420,7 @@ export default function DetailPermohonanPage() {
           </SectionCard>
 
           <div className="bg-[#1a2e6f] rounded-2xl p-5 text-white">
-            <p className="text-xs font-semibold uppercase tracking-wide mb-3 opacity-70">
-              Tindakan Cepat
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-wide mb-3 opacity-70">Tindakan Cepat</p>
             <div className="flex flex-col gap-2">
               <Link
                 href={`/admin/permohonan/${id}/edit`}
