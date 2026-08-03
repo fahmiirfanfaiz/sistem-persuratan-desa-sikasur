@@ -132,7 +132,7 @@ function DocumentUploadZone({ label, documentName, file, error, onFileChange, on
               className="flex-1 md:hidden flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1a2e6f]/10 text-[#1a2e6f] font-semibold text-sm rounded-xl hover:bg-[#1a2e6f]/20 transition border border-[#1a2e6f]/20"
             >
               <Camera size={16} />
-              Ambil Foto Langsung
+              Ambil Foto 
             </button>
           </div>
         </>
@@ -598,7 +598,7 @@ export default function SubmissionPage() {
                     onChange={handleChange}
                     className="w-full h-11.5 px-4 rounded-lg border border-gray-300 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f] transition"
                   />
-                  <p className="mt-1 text-xs text-gray-400">Pemberitahuan status surat akan dikirimkan ke nomor ini.</p>
+                 
                 </div>
 
                 <div>
@@ -652,7 +652,7 @@ export default function SubmissionPage() {
                     id="keperluan"
                     name="keperluan"
                     type="text"
-                    placeholder="Contoh: Persyaratan pendaftaran beasiswa / melamar pekerjaan"
+                    placeholder="Jelaskan keperluan pengajuan surat"
                     value={formData.keperluan}
                     onChange={handleChange}
                     className="w-full h-11.5 px-4 rounded-lg border border-gray-300 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f] transition"
