@@ -42,6 +42,18 @@ router.get(
   }
 );
 
+// GET /api/admin/submissions/:id/generated-letters/download
+router.get(
+  "/submissions/:id/generated-letters/download",
+  adminController.getGeneratedLetterDownloadUrl
+);
+
+// GET /api/admin/submissions/:id/generated-letters/:letterId/download
+router.get(
+  "/submissions/:id/generated-letters/:letterId/download",
+  adminController.getGeneratedLetterDownloadUrl
+);
+
 // Multer for generated letter upload (accepts docx, pdf, images)
 const uploadGenerated = multer({
   storage: multer.memoryStorage(),

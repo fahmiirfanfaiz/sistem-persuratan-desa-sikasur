@@ -74,8 +74,12 @@ const getGeneratedLetterUrl = async (req, res) => {
   try {
     const userId = req.user.userId;
     const { id } = req.params;
-    const url = await submissionService.getGeneratedLetterUrl(id, userId);
-    return res.status(200).json({ success: true, data: { url } });
+    const asAttachment = req.query.attachment !== "false";
+    const result = await submissionService.getGeneratedLetterUrl(id, userId, asAttachment);
+    return res.status(200).json({
+      success: true,
+      data: typeof result === "string" ? { url: result } : { url: result.url, filename: result.filename },
+    });
   } catch (error) {
     if (error instanceof ClientError) {
       return res.status(error.statusCode).json({ success: false, message: error.message });

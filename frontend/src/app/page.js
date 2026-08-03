@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Play, MapPin, Phone, Mail } from "lucide-react";
+import { ArrowRight, MapPin, Phone, Mail } from "lucide-react";
 import { FaInstagram, FaYoutube } from "react-icons/fa";
 import Navbar from "@/components/Navbar";
 
@@ -178,24 +178,21 @@ export default function LandingPage() {
                 Tutorial Pengajuan Surat
               </h2>
               <div className="mx-auto mt-3 h-0.75 w-20 rounded-full bg-[#1a2e6f]" />
+              <p className="text-sm text-gray-500 mt-3 max-w-xl mx-auto">
+                Tonton video panduan berikut untuk mengetahui alur dan tata cara pengajuan surat secara online di Desa Sikasur.
+              </p>
             </div>
 
-            {/* Video Placeholder */}
+            {/* YouTube Video Player */}
             <div className="max-w-215 mx-auto">
-              <div className="relative rounded-2xl overflow-hidden shadow-xl bg-gray-800 aspect-video flex items-center justify-center group cursor-pointer">
-                <Image
-                  src="/images/background-2.svg"
-                  alt="Tutorial thumbnail"
-                  fill
-                  className="object-cover opacity-60"
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-black aspect-video border border-gray-200">
+                <iframe
+                  src="https://www.youtube-nocookie.com/embed/XSJqOcVHklk"
+                  title="Tutorial Pengajuan Surat Desa Sikasur"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="w-full h-full border-0"
                 />
-                <div className="relative z-10 w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                  <Play
-                    size={28}
-                    className="text-[#1a2e6f] ml-1"
-                    fill="#1a2e6f"
-                  />
-                </div>
               </div>
             </div>
           </div>

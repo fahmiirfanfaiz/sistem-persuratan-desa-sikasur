@@ -80,7 +80,7 @@ function SectionCard({ title, icon: Icon, children }) {
   );
 }
 
-function PreviewModal({ isOpen, onClose, url, title, isPdf }) {
+function PreviewModal({ isOpen, onClose, url, title, isPdf, onDownload, downloading }) {
   if (!isOpen) return null;
 
   // Handle .docx fallback (since S3 url might have it in the path)
@@ -106,7 +106,7 @@ function PreviewModal({ isOpen, onClose, url, title, isPdf }) {
               <p className="text-xs text-gray-500 mt-1">Silakan unduh file untuk melihatnya.</p>
             </div>
           ) : isPdf ? (
-            <iframe src={url} title={title} className="w-full h-full min-h-125" style={{ border: 'none' }} />
+            <iframe src={url} title={title} className="w-full h-full min-h-125" style={{ border: 'none', height: '70vh' }} />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={url} alt={title} className="max-w-full max-h-[70vh] object-contain rounded-lg" />
@@ -116,15 +116,26 @@ function PreviewModal({ isOpen, onClose, url, title, isPdf }) {
           <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
             Tutup
           </button>
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#1a2e6f] hover:bg-[#152460] rounded-lg transition"
-          >
-            <Download size={13} />
-            Buka di Tab Baru
-          </a>
+          {onDownload ? (
+            <button
+              onClick={onDownload}
+              disabled={downloading}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#1a2e6f] hover:bg-[#152460] rounded-lg transition disabled:opacity-60"
+            >
+              {downloading ? <Loader2 size={13} className="animate-spin" /> : <Download size={13} />}
+              Unduh Surat
+            </button>
+          ) : (
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#1a2e6f] hover:bg-[#152460] rounded-lg transition"
+            >
+              <Download size={13} />
+              Buka di Tab Baru
+            </a>
+          )}
         </div>
       </div>
     </div>
@@ -199,41 +210,57 @@ function DocumentRow({ submissionId, doc }) {
 }
 
 function GeneratedLetterRow({ submissionId, letter }) {
-  const [loading, setLoading] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [downloadLoading, setDownloadLoading] = useState(false);
   const [error, setError] = useState('');
-  const [letterUrl, setLetterUrl] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
 
-  const fetchUrl = async () => {
-    if (letterUrl) return letterUrl;
-    setLoading(true);
+  const fetchUrl = async (asAttachment = false) => {
     setError('');
     try {
-      const res = await apiFetch(`/api/admin/submissions/${submissionId}/template/download`);
+      const res = await apiFetch(
+        `/api/admin/submissions/${submissionId}/generated-letters/${letter.id}/download?attachment=${asAttachment}`
+      );
       const json = await res.json();
       if (json.success && json.data?.url) {
-        setLetterUrl(json.data.url);
-        return json.data.url;
+        return json.data;
       } else {
-        setError('Gagal mendapatkan link surat');
+        setError(json.message || 'Gagal mendapatkan link surat');
         return null;
       }
     } catch {
       setError('Gagal terhubung ke server');
       return null;
-    } finally {
-      setLoading(false);
     }
   };
 
   const handlePreview = async () => {
-    const url = await fetchUrl();
-    if (url) setShowPreview(true);
+    if (previewUrl) {
+      setShowPreview(true);
+      return;
+    }
+    setPreviewLoading(true);
+    const data = await fetchUrl(false);
+    setPreviewLoading(false);
+    if (data?.url) {
+      setPreviewUrl(data.url);
+      setShowPreview(true);
+    }
   };
 
   const handleDownload = async () => {
-    const url = await fetchUrl();
-    if (url) window.open(url, '_blank');
+    setDownloadLoading(true);
+    const data = await fetchUrl(true);
+    setDownloadLoading(false);
+    if (data?.url) {
+      const a = document.createElement('a');
+      a.href = data.url;
+      if (data.filename) a.download = data.filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
   };
 
   const isPdf = letter.path?.toLowerCase().endsWith('.pdf');
@@ -261,25 +288,33 @@ function GeneratedLetterRow({ submissionId, letter }) {
           <div className="flex gap-2">
             <button
               onClick={handlePreview}
-              disabled={loading}
+              disabled={previewLoading || downloadLoading}
               className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-violet-600 bg-white border border-violet-300 rounded-lg hover:bg-violet-50 transition disabled:opacity-60"
             >
-              {loading ? <Loader2 size={12} className="animate-spin" /> : <Eye size={12} />}
+              {previewLoading ? <Loader2 size={12} className="animate-spin" /> : <Eye size={12} />}
               Lihat
             </button>
             <button
               onClick={handleDownload}
-              disabled={loading}
+              disabled={previewLoading || downloadLoading}
               className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-violet-600 bg-white border border-violet-300 rounded-lg hover:bg-violet-50 transition disabled:opacity-60"
             >
-              {loading ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
+              {downloadLoading ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
               Unduh
             </button>
           </div>
         </div>
       </div>
-      {showPreview && letterUrl && (
-        <PreviewModal isOpen={showPreview} onClose={() => setShowPreview(false)} url={letterUrl} title="Surat yang Diterbitkan" isPdf={isPdf} />
+      {showPreview && previewUrl && (
+        <PreviewModal
+          isOpen={showPreview}
+          onClose={() => setShowPreview(false)}
+          url={previewUrl}
+          title="Surat yang Diterbitkan"
+          isPdf={isPdf}
+          onDownload={handleDownload}
+          downloading={downloadLoading}
+        />
       )}
     </>
   );

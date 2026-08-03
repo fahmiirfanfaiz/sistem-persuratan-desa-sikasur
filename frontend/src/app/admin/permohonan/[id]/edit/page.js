@@ -163,8 +163,13 @@ export default function EditPermohonanPage() {
     try {
       const res = await apiFetch(`/api/admin/letter-types/${submission.letterType.id}/template/download`);
       const json = await res.json();
-      if (json.success) {
-        window.location.href = json.data.url;
+      if (json.success && json.data?.url) {
+        const a = document.createElement('a');
+        a.href = json.data.url;
+        if (json.data.name) a.download = json.data.name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
       } else {
         alert(json.message || "Template tidak tersedia");
       }

@@ -102,6 +102,24 @@ const getTemplateDownloadUrl = async (req, res) => {
   }
 };
 
+const getGeneratedLetterDownloadUrl = async (req, res) => {
+  try {
+    const { id, letterId } = req.params;
+    const asAttachment = req.query.attachment !== "false";
+    const result = await submissionService.getGeneratedLetterSignedUrlForAdmin(id, letterId || null, asAttachment);
+    return res.status(200).json({
+      success: true,
+      data: typeof result === "string" ? { url: result } : { url: result.url, filename: result.filename },
+    });
+  } catch (error) {
+    if (error instanceof ClientError || error.name === "ClientError") {
+      return res.status(error.statusCode || 400).json({ success: false, message: error.message });
+    }
+    console.error("[admin.getGeneratedLetterDownloadUrl]", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 const getDashboardStats = async (req, res) => {
   try {
     const year = req.query.year ? parseInt(req.query.year, 10) : new Date().getFullYear();
@@ -284,6 +302,7 @@ export default {
   deleteSubmission,
   getDocumentDownloadUrl,
   getTemplateDownloadUrl,
+  getGeneratedLetterDownloadUrl,
   getDashboardStats,
   createCategory,
   updateCategory,

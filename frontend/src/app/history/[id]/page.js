@@ -145,11 +145,12 @@ function ProgressTracker({ status }) {
   );
 }
 
-function PreviewModal({ isOpen, onClose, url, isPdf }) {
+function PreviewModal({ isOpen, onClose, previewUrl, onDownload, downloading }) {
   if (!isOpen) return null;
 
   // Handle .docx fallback (since S3 url might have it in the path)
-  const isDocx = url?.toLowerCase().includes('.docx') || url?.toLowerCase().includes('.doc');
+  const isDocx = previewUrl?.toLowerCase().includes('.docx') || previewUrl?.toLowerCase().includes('.doc');
+  const isPdf = previewUrl?.toLowerCase().includes('.pdf') || false;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-[2px] p-4" onClick={onClose}>
@@ -171,25 +172,24 @@ function PreviewModal({ isOpen, onClose, url, isPdf }) {
               <p className="text-xs text-gray-500 mt-1">Silakan unduh file untuk melihatnya.</p>
             </div>
           ) : isPdf ? (
-            <iframe src={url} title="Surat" className="w-full min-h-125" style={{ border: 'none', height: '70vh' }} />
+            <iframe src={previewUrl} title="Surat" className="w-full min-h-125" style={{ border: 'none', height: '70vh' }} />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={url} alt="Surat" className="max-w-full max-h-[70vh] object-contain rounded-lg" />
+            <img src={previewUrl} alt="Surat" className="max-w-full max-h-[70vh] object-contain rounded-lg" />
           )}
         </div>
         <div className="flex justify-end gap-2 px-5 py-3 border-t border-gray-100">
           <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
             Tutup
           </button>
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#1a2e6f] hover:bg-[#152460] rounded-lg transition"
+          <button
+            onClick={onDownload}
+            disabled={downloading}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#1a2e6f] hover:bg-[#152460] rounded-lg transition disabled:opacity-60"
           >
-            <Download size={13} />
-            Unduh / Buka di Tab Baru
-          </a>
+            {downloading ? <Loader2 size={13} className="animate-spin" /> : <Download size={13} />}
+            Unduh Surat
+          </button>
         </div>
       </div>
     </div>
@@ -197,21 +197,19 @@ function PreviewModal({ isOpen, onClose, url, isPdf }) {
 }
 
 function LetterSection({ submissionId }) {
-  const [loading, setLoading] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [downloadLoading, setDownloadLoading] = useState(false);
   const [error, setError] = useState('');
-  const [url, setUrl] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
 
-  const fetchUrl = async () => {
-    if (url) return url;
-    setLoading(true);
+  const fetchUrl = async (asAttachment = false) => {
     setError('');
     try {
-      const res = await apiFetch(`/api/submissions/${submissionId}/download`);
+      const res = await apiFetch(`/api/submissions/${submissionId}/download?attachment=${asAttachment}`);
       const json = await res.json();
       if (json.success && json.data?.url) {
-        setUrl(json.data.url);
-        return json.data.url;
+        return json.data;
       } else {
         setError(json.message || 'Surat belum tersedia untuk diunduh');
         return null;
@@ -219,22 +217,36 @@ function LetterSection({ submissionId }) {
     } catch {
       setError('Gagal terhubung ke server');
       return null;
-    } finally {
-      setLoading(false);
     }
   };
 
   const handlePreview = async () => {
-    const result = await fetchUrl();
-    if (result) setShowPreview(true);
+    if (previewUrl) {
+      setShowPreview(true);
+      return;
+    }
+    setPreviewLoading(true);
+    const data = await fetchUrl(false);
+    setPreviewLoading(false);
+    if (data?.url) {
+      setPreviewUrl(data.url);
+      setShowPreview(true);
+    }
   };
 
   const handleDownload = async () => {
-    const result = await fetchUrl();
-    if (result) window.open(result, '_blank');
+    setDownloadLoading(true);
+    const data = await fetchUrl(true);
+    setDownloadLoading(false);
+    if (data?.url) {
+      const a = document.createElement('a');
+      a.href = data.url;
+      if (data.filename) a.download = data.filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
   };
-
-  const isPdf = url?.toLowerCase().includes('.pdf') || false;
 
   return (
     <div className="bg-white rounded-2xl border border-[#1a2e6f]/20 shadow-sm p-6">
@@ -253,24 +265,30 @@ function LetterSection({ submissionId }) {
       <div className="flex gap-3">
         <button
           onClick={handlePreview}
-          disabled={loading}
+          disabled={previewLoading || downloadLoading}
           className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-[#1a2e6f] bg-[#1a2e6f]/10 hover:bg-[#1a2e6f]/20 border border-[#1a2e6f]/20 rounded-xl transition disabled:opacity-60"
         >
-          {loading ? <Loader2 size={16} className="animate-spin" /> : <Eye size={16} />}
-          {loading ? 'Memuat...' : 'Lihat Surat'}
+          {previewLoading ? <Loader2 size={16} className="animate-spin" /> : <Eye size={16} />}
+          {previewLoading ? 'Memuat...' : 'Lihat Surat'}
         </button>
         <button
           onClick={handleDownload}
-          disabled={loading}
+          disabled={previewLoading || downloadLoading}
           className="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-white bg-[#1a2e6f] hover:bg-[#152460] rounded-xl transition shadow-sm disabled:opacity-60"
         >
-          {loading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
-          {loading ? 'Memuat...' : 'Unduh Surat'}
+          {downloadLoading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+          {downloadLoading ? 'Mengunduh...' : 'Unduh Surat'}
         </button>
       </div>
 
-      {showPreview && url && (
-        <PreviewModal isOpen={showPreview} onClose={() => setShowPreview(false)} url={url} isPdf={isPdf} />
+      {showPreview && previewUrl && (
+        <PreviewModal
+          isOpen={showPreview}
+          onClose={() => setShowPreview(false)}
+          previewUrl={previewUrl}
+          onDownload={handleDownload}
+          downloading={downloadLoading}
+        />
       )}
     </div>
   );

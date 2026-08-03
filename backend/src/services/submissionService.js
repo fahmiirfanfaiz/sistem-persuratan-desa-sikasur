@@ -447,19 +447,95 @@ const getMonthlyStats = async (year) => {
 /**
  * Get signed download URL for a generated letter (for user).
  */
-const getGeneratedLetterUrl = async (submissionId, userId) => {
+const getGeneratedLetterUrl = async (submissionId, userId, asAttachment = true) => {
   const letter = await prisma.generatedLetter.findFirst({
     where: {
       submissionId,
       submission: { userId },
     },
     orderBy: { createdAt: "desc" },
-    select: { id: true, path: true },
+    select: {
+      id: true,
+      path: true,
+      submission: {
+        select: {
+          user: { select: { name: true } },
+          letterType: { select: { name: true } },
+        },
+      },
+    },
   });
 
   if (!letter) throw new ClientError("Surat belum tersedia", 404);
-  const url = await getSignedDownloadUrl(letter.path, BUCKET_NAME, 300);
-  return url;
+
+  const ext = letter.path.split(".").pop() || "pdf";
+  const letterTypeName = (letter.submission?.letterType?.name || "Surat")
+    .replace(/[^a-zA-Z0-9_\- ]/g, "")
+    .trim()
+    .replace(/\s+/g, "_");
+  const userName = (letter.submission?.user?.name || "Warga")
+    .replace(/[^a-zA-Z0-9_\- ]/g, "")
+    .trim()
+    .replace(/\s+/g, "_");
+  const downloadName = `${letterTypeName}_${userName}.${ext}`;
+
+  const url = await getSignedDownloadUrl(
+    letter.path,
+    BUCKET_NAME,
+    300,
+    asAttachment,
+    downloadName
+  );
+  return { url, filename: downloadName };
+};
+
+/**
+ * Get signed download URL for a generated letter (for admin).
+ */
+const getGeneratedLetterSignedUrlForAdmin = async (
+  submissionId,
+  letterId = null,
+  asAttachment = true
+) => {
+  const where = { submissionId };
+  if (letterId) where.id = letterId;
+
+  const letter = await prisma.generatedLetter.findFirst({
+    where,
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      path: true,
+      submission: {
+        select: {
+          user: { select: { name: true } },
+          letterType: { select: { name: true } },
+        },
+      },
+    },
+  });
+
+  if (!letter) throw new ClientError("Surat terbitan tidak ditemukan", 404);
+
+  const ext = letter.path.split(".").pop() || "pdf";
+  const letterTypeName = (letter.submission?.letterType?.name || "Surat")
+    .replace(/[^a-zA-Z0-9_\- ]/g, "")
+    .trim()
+    .replace(/\s+/g, "_");
+  const userName = (letter.submission?.user?.name || "Warga")
+    .replace(/[^a-zA-Z0-9_\- ]/g, "")
+    .trim()
+    .replace(/\s+/g, "_");
+  const downloadName = `${letterTypeName}_${userName}.${ext}`;
+
+  const url = await getSignedDownloadUrl(
+    letter.path,
+    BUCKET_NAME,
+    300,
+    asAttachment,
+    downloadName
+  );
+  return { url, filename: downloadName };
 };
 
 /**
@@ -487,5 +563,6 @@ export default {
   updateSubmissionStatus,
   getMonthlyStats,
   getGeneratedLetterUrl,
+  getGeneratedLetterSignedUrlForAdmin,
   deleteSubmission,
 };
