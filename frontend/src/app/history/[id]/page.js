@@ -98,7 +98,7 @@ function ProgressTracker({ status }) {
   if (isRejected) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-2xl p-5 flex items-center gap-4">
-        <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
           <XCircle size={20} className="text-red-500" />
         </div>
         <div>
@@ -134,7 +134,7 @@ function ProgressTracker({ status }) {
                 </span>
               </div>
               {idx < STEPS.length - 1 && (
-                <div className={`flex-1 h-[2px] mb-5 mx-1 rounded-full transition-all ${currentStep > s.step ? 'bg-[#1a2e6f]' : 'bg-gray-200'}`} />
+                <div className={`flex-1 h-0.5 mb-5 mx-1 rounded-full transition-all ${currentStep > s.step ? 'bg-[#1a2e6f]' : 'bg-gray-200'}`} />
               )}
             </div>
           );
@@ -163,7 +163,7 @@ function PreviewModal({ isOpen, onClose, url, isPdf }) {
             <X size={18} />
           </button>
         </div>
-        <div className="flex-1 overflow-auto bg-gray-50 min-h-[400px] flex items-center justify-center">
+        <div className="flex-1 overflow-auto bg-gray-50 min-h-100 flex items-center justify-center">
           {isDocx ? (
             <div className="flex flex-col items-center p-8 text-center">
               <FileText size={48} className="text-gray-400 mb-4" />
@@ -171,7 +171,7 @@ function PreviewModal({ isOpen, onClose, url, isPdf }) {
               <p className="text-xs text-gray-500 mt-1">Silakan unduh file untuk melihatnya.</p>
             </div>
           ) : isPdf ? (
-            <iframe src={url} title="Surat" className="w-full min-h-[500px]" style={{ border: 'none', height: '70vh' }} />
+            <iframe src={url} title="Surat" className="w-full min-h-125" style={{ border: 'none', height: '70vh' }} />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={url} alt="Surat" className="max-w-full max-h-[70vh] object-contain rounded-lg" />
@@ -239,7 +239,7 @@ function LetterSection({ submissionId }) {
   return (
     <div className="bg-white rounded-2xl border border-[#1a2e6f]/20 shadow-sm p-6">
       <div className="flex items-center gap-3 mb-5">
-        <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center shrink-0">
           <FileCheck size={20} className="text-violet-600" />
         </div>
         <div>
@@ -313,7 +313,7 @@ export default function HistoryDetailPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#f8f9fc]">
       <Navbar />
-      <main className="flex-1 max-w-[860px] mx-auto w-full px-6 py-10">
+      <main className="flex-1 max-w-215 mx-auto w-full px-6 py-10">
         <div className="flex items-center gap-2 text-xs text-gray-400 mb-6">
           <Link href="/" className="hover:text-[#1a2e6f] transition">Beranda</Link>
           <ChevronRight size={12} />
@@ -348,7 +348,7 @@ export default function HistoryDetailPage() {
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#1a2e6f]/10 flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-[#1a2e6f]/10 flex items-center justify-center shrink-0">
                     <History size={22} className="text-[#1a2e6f]" />
                   </div>
                   <div>
@@ -385,7 +385,7 @@ export default function HistoryDetailPage() {
 
             {isCompleted && !hasGeneratedLetter && (
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex items-center gap-4">
-                <AlertCircle size={20} className="text-amber-500 flex-shrink-0" />
+                <AlertCircle size={20} className="text-amber-500 shrink-0" />
                 <p className="text-sm text-amber-700">Status pengajuan sudah selesai namun surat belum diunggah. Silakan hubungi kantor desa.</p>
               </div>
             )}

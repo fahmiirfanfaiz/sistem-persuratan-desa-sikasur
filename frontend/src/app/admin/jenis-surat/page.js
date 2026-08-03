@@ -106,7 +106,7 @@ export default function JenisSuratPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm min-w-[800px]">
+            <table className="w-full text-sm min-w-200">
               <thead>
                 <tr className="border-b border-gray-100 text-left">
                   <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Nama Surat</th>

@@ -7,11 +7,12 @@ import {
   ChevronDown,
   Upload,
   Camera,
-  FolderOpen,
   X,
   AlertCircle,
   Loader2,
   FileText,
+  CheckCircle2,
+  HelpCircle,
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -20,14 +21,18 @@ import { getStoredUser, apiFetch } from '@/lib/api';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+// Batasan ukuran file: 2 MB per file agar total kedua file (KK + KTP) aman di bawah batas 4.5 MB request body serverless Vercel
+const MAX_FILE_SIZE_MB = 2;
+const MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024;
+const MAX_TOTAL_SIZE_MB = 4;
+const MAX_TOTAL_SIZE = MAX_TOTAL_SIZE_MB * 1024 * 1024;
 const ALLOWED_MIME = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'];
 
 function isPdf(file) {
   return file?.type === 'application/pdf';
 }
 
-function DocumentUploadZone({ label, file, onFileChange, onRemove, id }) {
+function DocumentUploadZone({ label, documentName, file, error, onFileChange, onRemove, id }) {
   const fileInputRef = useRef(null);
   const cameraInputRef = useRef(null);
   const [dragging, setDragging] = useState(false);
@@ -46,73 +51,105 @@ function DocumentUploadZone({ label, file, onFileChange, onRemove, id }) {
 
   const handleDragLeave = () => setDragging(false);
 
-  if (file) {
-    return (
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
-        <div className="relative border border-dashed border-gray-300 rounded-lg bg-gray-50 p-4 flex items-center gap-3">
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-2">
+        <label className="block text-sm font-medium text-gray-700">{label}</label>
+        <span className="text-[11px] text-gray-400 font-medium">Maks. 2 MB</span>
+      </div>
+
+      {file ? (
+        <div className="relative border border-emerald-200 rounded-xl bg-emerald-50/40 p-4 flex items-center gap-3 transition">
           {!isPdf(file) ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={URL.createObjectURL(file)}
               alt="preview"
-              className="w-14 h-14 object-cover rounded-lg border border-gray-200 flex-shrink-0"
+              className="w-14 h-14 object-cover rounded-lg border border-emerald-200 shrink-0 shadow-xs"
             />
           ) : (
-            <div className="w-14 h-14 rounded-lg border border-gray-200 bg-red-50 flex items-center justify-center flex-shrink-0">
-              <FileText size={24} className="text-red-500" />
+            <div className="w-14 h-14 rounded-lg border border-red-200 bg-red-50 flex items-center justify-center shrink-0 shadow-xs">
+              <FileText size={26} className="text-red-500" />
             </div>
           )}
+
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-800 truncate">{file.name}</p>
-            <p className="text-xs text-gray-500 mt-0.5">
-              {(file.size / 1024 / 1024).toFixed(2)} MB · {isPdf(file) ? 'PDF' : 'Gambar'}
+            <div className="flex items-center gap-1.5">
+              <p className="text-sm font-semibold text-gray-800 truncate">{file.name}</p>
+              <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
+            </div>
+            <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-2">
+              <span>{(file.size / (1024 * 1024)).toFixed(2)} MB</span>
+              <span>·</span>
+              <span className="font-medium text-emerald-700">{isPdf(file) ? 'Dokumen PDF' : 'Gambar'}</span>
             </p>
           </div>
+
           <button
             type="button"
             onClick={onRemove}
-            className="flex-shrink-0 p-1.5 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition"
+            className="shrink-0 p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition"
+            title="Hapus file"
             aria-label="Hapus file"
           >
-            <X size={16} />
+            <X size={18} />
           </button>
         </div>
-      </div>
-    );
-  }
+      ) : (
+        <>
+          <div
+            role="button"
+            tabIndex={0}
+            aria-label={`Unggah ${label}`}
+            className={`border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-2 py-7 px-4 ${
+              error
+                ? 'border-red-300 bg-red-50/40 hover:bg-red-50/60'
+                : dragging
+                ? 'border-[#1a2e6f] bg-[#1a2e6f]/5'
+                : 'border-gray-300 hover:border-[#1a2e6f] hover:bg-gray-50/80'
+            }`}
+            onClick={() => fileInputRef.current?.click()}
+            onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+          >
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${error ? 'bg-red-100 text-red-600' : 'bg-[#1a2e6f]/10 text-[#1a2e6f]'}`}>
+              <Upload size={20} strokeWidth={1.8} />
+            </div>
+            <p className="text-sm font-medium text-gray-700 text-center">
+              Klik untuk memilih file atau seret & lepas di sini
+            </p>
+            <p className="text-xs text-gray-400 text-center">
+              Format yang didukung: <span className="font-medium text-gray-600">JPG, PNG, WEBP, atau PDF</span> (Maks. 2 MB)
+            </p>
+          </div>
 
-  return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
-      <div
-        role="button"
-        tabIndex={0}
-        aria-label={`Unggah ${label}`}
-        className={`border-2 border-dashed rounded-lg cursor-pointer transition-colors flex flex-col items-center justify-center gap-2 py-7 px-4 ${
-          dragging ? 'border-[#1a2e6f] bg-[#1a2e6f]/5' : 'border-gray-300 hover:border-[#1a2e6f] hover:bg-gray-50'
-        }`}
-        onClick={() => fileInputRef.current?.click()}
-        onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-      >
-        <Upload size={22} className="text-gray-400" strokeWidth={1.5} />
-        <p className="text-sm text-gray-500 text-center">Klik Untuk Mengunggah Atau Seret Dan Lepas</p>
-        <p className="text-xs text-gray-400">Format: Gambar atau PDF (Maks. 5 MB)</p>
-      </div>
+          <div className="flex gap-2 mt-2">
+            <button
+              type="button"
+              onClick={() => cameraInputRef.current?.click()}
+              className="flex-1 md:hidden flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1a2e6f]/10 text-[#1a2e6f] font-semibold text-sm rounded-xl hover:bg-[#1a2e6f]/20 transition border border-[#1a2e6f]/20"
+            >
+              <Camera size={16} />
+              Ambil Foto Langsung
+            </button>
+          </div>
+        </>
+      )}
 
-      <div className="flex gap-2 mt-2">
-        <button
-          type="button"
-          onClick={() => cameraInputRef.current?.click()}
-          className="flex-1 md:hidden flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1a2e6f]/10 text-[#1a2e6f] font-semibold text-sm rounded-xl hover:bg-[#1a2e6f]/20 transition border border-[#1a2e6f]/20"
-        >
-          <Camera size={16} />
-          Ambil Foto
-        </button>
-      </div>
+      {/* Inline Humanist Error Message */}
+      {error && (
+        <div className="mt-2.5 flex items-start gap-2 bg-red-50 border border-red-200 rounded-lg p-3 text-xs text-red-700 animate-in fade-in duration-200">
+          <AlertCircle size={16} className="shrink-0 text-red-500 mt-0.5" />
+          <div className="flex-1">
+            <p className="font-semibold">{error}</p>
+            <p className="text-gray-600 mt-1">
+              💡 <strong>Tips:</strong> Anda dapat mengompres gambar melalui aplikasi foto bawaan, melakukan tangkapan layar (screenshot), atau memilih resolusi standar.
+            </p>
+          </div>
+        </div>
+      )}
 
       <input
         ref={fileInputRef}
@@ -163,7 +200,7 @@ function CustomSelect({ id, value, onChange, options, placeholder, disabled }) {
         type="button"
         disabled={disabled}
         onClick={() => !disabled && setOpen((v) => !v)}
-        className={`w-full flex items-center justify-between h-[46px] px-4 rounded-lg border text-sm transition ${
+        className={`w-full flex items-center justify-between h-11.5 px-4 rounded-lg border text-sm transition ${
           disabled ? 'bg-gray-100 cursor-not-allowed text-gray-400' : 'bg-white cursor-pointer'
         } ${open ? 'border-[#1a2e6f] ring-2 ring-[#1a2e6f]/20' : 'border-gray-300'} text-left`}
         aria-haspopup="listbox"
@@ -174,12 +211,12 @@ function CustomSelect({ id, value, onChange, options, placeholder, disabled }) {
         </span>
         <ChevronDown
           size={16}
-          className={`text-gray-400 flex-shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          className={`text-gray-400 shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
         />
       </button>
 
       {open && options.length > 0 && (
-        <div role="listbox" className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+        <div role="listbox" className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden max-h-60 overflow-y-auto">
           {options.map((opt) => (
             <div
               key={opt.value}
@@ -224,6 +261,7 @@ export default function SubmissionPage() {
   });
 
   const [fieldErrors, setFieldErrors] = useState({ nik: '', nomorKK: '' });
+  const [fileErrors, setFileErrors] = useState({ kkFile: '', ktpFile: '' });
   const [kkFile, setKkFile] = useState(null);
   const [ktpFile, setKtpFile] = useState(null);
   const [formError, setFormError] = useState('');
@@ -296,8 +334,12 @@ export default function SubmissionPage() {
     const digits = onlyDigits(value);
     setFormData((prev) => ({ ...prev, [name]: digits }));
     if (formError) setFormError('');
+
     if (digits.length > 0 && digits.length < 16) {
-      setFieldErrors((prev) => ({ ...prev, [name]: 'Harus 16 digit' }));
+      setFieldErrors((prev) => ({
+        ...prev,
+        [name]: `Baru ${digits.length} dari 16 digit (kurang ${16 - digits.length} digit lagi)`,
+      }));
     } else {
       setFieldErrors((prev) => ({ ...prev, [name]: '' }));
     }
@@ -313,35 +355,69 @@ export default function SubmissionPage() {
     if (formError) setFormError('');
   };
 
-  const handleFileValidation = (file, fieldName) => {
+  // Validasi Humanis untuk File Satuan & Total
+  const validateSingleFile = (file, documentName, fieldKey) => {
     if (!ALLOWED_MIME.includes(file.type)) {
-      setFormError(`File ${fieldName} harus berformat gambar (JPEG/PNG/WEBP) atau PDF`);
+      const errMsg = `Format file "${file.name}" tidak didukung. Mohon gunakan foto (JPG, PNG, WEBP) atau PDF.`;
+      setFileErrors((prev) => ({ ...prev, [fieldKey]: errMsg }));
       return false;
     }
+
     if (file.size > MAX_FILE_SIZE) {
-      setFormError(`File ${fieldName} tidak boleh lebih dari 5 MB`);
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      const errMsg = `Ukuran file ${documentName} (${sizeMB} MB) melebihi batas maksimal 2 MB.`;
+      setFileErrors((prev) => ({ ...prev, [fieldKey]: errMsg }));
       return false;
     }
-    setFormError('');
+
+    setFileErrors((prev) => ({ ...prev, [fieldKey]: '' }));
+    if (formError) setFormError('');
     return true;
   };
 
-  const handleKkFileChange = (file) => { if (handleFileValidation(file, 'Kartu Keluarga')) setKkFile(file); };
-  const handleKtpFileChange = (file) => { if (handleFileValidation(file, 'KTP')) setKtpFile(file); };
+  const handleKkFileChange = (file) => {
+    if (validateSingleFile(file, 'Kartu Keluarga', 'kkFile')) {
+      // Cek total jika ktpFile sudah ada
+      if (ktpFile && file.size + ktpFile.size > MAX_TOTAL_SIZE) {
+        const totalMB = ((file.size + ktpFile.size) / (1024 * 1024)).toFixed(2);
+        setFormError(`Total ukuran file KK dan KTP (${totalMB} MB) melebihi batas 4 MB. Mohon kurangi ukuran salah satu file.`);
+      }
+      setKkFile(file);
+    }
+  };
+
+  const handleKtpFileChange = (file) => {
+    if (validateSingleFile(file, 'KTP', 'ktpFile')) {
+      // Cek total jika kkFile sudah ada
+      if (kkFile && file.size + kkFile.size > MAX_TOTAL_SIZE) {
+        const totalMB = ((file.size + kkFile.size) / (1024 * 1024)).toFixed(2);
+        setFormError(`Total ukuran file KK dan KTP (${totalMB} MB) melebihi batas 4 MB. Mohon kurangi ukuran salah satu file.`);
+      }
+      setKtpFile(file);
+    }
+  };
 
   const validateForm = () => {
-    if (!formData.namaLengkap.trim()) return 'Nama lengkap wajib diisi';
-    if (!formData.nik.trim()) return 'NIK wajib diisi';
-    if (formData.nik.length !== 16) return 'NIK harus 16 digit angka';
-    if (!formData.nomorKK.trim()) return 'Nomor KK wajib diisi';
-    if (formData.nomorKK.length !== 16) return 'Nomor KK harus 16 digit angka';
-    if (!formData.nomorWhatsapp.trim()) return 'Nomor WhatsApp wajib diisi';
-    if (!formData.alamat.trim()) return 'Alamat wajib diisi';
-    if (!formData.categoryId) return 'Jenis surat wajib dipilih';
-    if (!formData.letterTypeId) return 'Surat wajib dipilih';
-    if (!formData.keperluan.trim()) return 'Keperluan wajib diisi';
-    if (!kkFile) return 'File Kartu Keluarga wajib diunggah';
-    if (!ktpFile) return 'File KTP wajib diunggah';
+    if (!formData.namaLengkap.trim()) return 'Mohon lengkapi Nama Lengkap Anda.';
+    if (!formData.nik.trim()) return 'Mohon isi NIK (Nomor Induk Kependudukan).';
+    if (formData.nik.length !== 16) return 'NIK harus terdiri dari tepat 16 digit angka.';
+    if (!formData.nomorKK.trim()) return 'Mohon isi Nomor Kartu Keluarga.';
+    if (formData.nomorKK.length !== 16) return 'Nomor KK harus terdiri dari tepat 16 digit angka.';
+    if (!formData.nomorWhatsapp.trim()) return 'Mohon isi Nomor WhatsApp aktif pemohon.';
+    if (!formData.alamat.trim()) return 'Mohon isi Alamat lengkap pemohon.';
+    if (!formData.categoryId) return 'Mohon pilih Jenis Surat yang diajukan.';
+    if (!formData.letterTypeId) return 'Mohon pilih Surat permohonan.';
+    if (!formData.keperluan.trim()) return 'Mohon jelaskan Keperluan permohonan surat.';
+    if (!kkFile) return 'Mohon unggah dokumen Kartu Keluarga (KK).';
+    if (!ktpFile) return 'Mohon unggah dokumen KTP.';
+
+    // Validasi kumulatif ukuran kedua file
+    const totalSize = (kkFile?.size || 0) + (ktpFile?.size || 0);
+    if (totalSize > MAX_TOTAL_SIZE) {
+      const totalMB = (totalSize / (1024 * 1024)).toFixed(2);
+      return `Total ukuran file KK dan KTP (${totalMB} MB) melebihi batas aman 4 MB. Mohon gunakan dokumen dengan resolusi lebih ringkas.`;
+    }
+
     return null;
   };
 
@@ -369,13 +445,15 @@ export default function SubmissionPage() {
 
       if (!res.ok) {
         setConfirmOpen(false);
-        setFormError(json.message || 'Terjadi kesalahan. Silakan coba lagi.');
+        setFormError(json.message || 'Terjadi kendala saat memproses permohonan. Silakan periksa kembali data Anda.');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
       router.push(`/submission/success/${json.data.submissionId}`);
     } catch {
       setConfirmOpen(false);
-      setFormError('Tidak dapat terhubung ke server. Pastikan backend berjalan.');
+      setFormError('Tidak dapat terhubung ke server. Pastikan koneksi internet stabil dan total dokumen tidak melebihi batas upload.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally {
       setIsSubmitting(false);
     }
@@ -396,7 +474,7 @@ export default function SubmissionPage() {
       <section className="relative w-full py-10 flex items-center overflow-hidden" style={{ minHeight: 140 }}>
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/images/background-1.svg')" }} />
         <div className="absolute inset-0 bg-[#0a0f2e]/65" />
-        <div className="relative z-10 max-w-[1140px] mx-auto px-6 w-full">
+        <div className="relative z-10 max-w-285 mx-auto px-6 w-full">
           <button
             onClick={() => router.back()}
             className="flex items-center gap-2 text-white/80 hover:text-white text-sm mb-3 transition"
@@ -410,7 +488,7 @@ export default function SubmissionPage() {
       </section>
 
       <main className="flex-1 py-6 sm:py-10">
-        <div className="max-w-[720px] mx-auto px-4 sm:px-6">
+        <div className="max-w-180 mx-auto px-4 sm:px-6">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-5 py-6 sm:px-8 sm:py-8">
             <div className="text-center mb-6">
               <h2 className="text-lg font-bold text-gray-900">Data Permohonan Surat</h2>
@@ -419,20 +497,22 @@ export default function SubmissionPage() {
               </p>
             </div>
 
-            <div className="flex items-start gap-3 bg-[#e8f4fd] border border-[#b3d9f5] rounded-lg px-4 py-3 mb-8">
-              <AlertCircle size={18} className="text-[#1a6fa8] mt-0.5 flex-shrink-0" />
+            <div className="flex items-start gap-3 bg-[#e8f4fd] border border-[#b3d9f5] rounded-xl px-4 py-3.5 mb-8">
+              <AlertCircle size={18} className="text-[#1a6fa8] mt-0.5 shrink-0" />
               <div>
-                <p className="text-xs font-semibold text-[#1a6fa8]">Perhatian</p>
+                <p className="text-xs font-bold text-[#1a6fa8]">Panduan Pengunggahan Dokumen</p>
                 <p className="text-[11px] sm:text-xs text-[#1a6fa8] mt-0.5 leading-relaxed">
-                  Pastikan Data Yang Anda Masukkan Sudah Benar. Dokumen KK Dan KTP Harus Jelas, Terbaca, Dan Sesuai
-                  Dengan Identitas Pemohon. Format yang diterima: Gambar (JPEG/PNG/WEBP) atau PDF.
+                  Dokumen KK dan KTP harus jelas dan terbaca. Format yang didukung adalah <strong>JPG, PNG, WEBP, atau PDF</strong> dengan ukuran <strong>maksimal 2 MB per dokumen</strong>.
                 </p>
               </div>
             </div>
 
             {formError && (
-              <div className="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                {formError}
+              <div className="mb-6 rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-700 flex items-start gap-3 animate-in fade-in duration-200">
+                <AlertCircle size={18} className="shrink-0 text-red-600 mt-0.5" />
+                <div className="flex-1">
+                  <p className="font-semibold">{formError}</p>
+                </div>
               </div>
             )}
 
@@ -448,70 +528,89 @@ export default function SubmissionPage() {
                     placeholder="Masukkan nama lengkap"
                     value={formData.namaLengkap}
                     onChange={handleChange}
-                    className="w-full h-[46px] px-4 rounded-lg border border-gray-300 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f] transition"
+                    className="w-full h-11.5 px-4 rounded-lg border border-gray-300 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f] transition"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="nik" className="block text-sm font-medium text-gray-700 mb-1.5">NIK</label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label htmlFor="nik" className="block text-sm font-medium text-gray-700">NIK (Nomor Induk Kependudukan)</label>
+                    <span className={`text-[11px] font-medium ${formData.nik.length === 16 ? 'text-emerald-600' : 'text-gray-400'}`}>
+                      {formData.nik.length}/16 digit
+                    </span>
+                  </div>
                   <input
                     id="nik"
                     name="nik"
                     type="text"
                     inputMode="numeric"
                     maxLength={16}
-                    placeholder="Masukkan NIK (16 digit)"
+                    placeholder="Masukkan 16 digit NIK"
                     value={formData.nik}
                     onChange={handleNumericChange}
-                    className={`w-full h-[46px] px-4 rounded-lg border text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f] transition ${
-                      fieldErrors.nik ? 'border-red-400 bg-red-50' : 'border-gray-300'
+                    className={`w-full h-11.5 px-4 rounded-lg border text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f] transition ${
+                      fieldErrors.nik ? 'border-amber-400 bg-amber-50/40' : formData.nik.length === 16 ? 'border-emerald-400' : 'border-gray-300'
                     }`}
                   />
-                  {fieldErrors.nik && <p className="mt-1 text-xs text-red-600">{fieldErrors.nik}</p>}
+                  {fieldErrors.nik ? (
+                    <p className="mt-1 text-xs text-amber-700 font-medium">{fieldErrors.nik}</p>
+                  ) : formData.nik.length === 16 ? (
+                    <p className="mt-1 text-xs text-emerald-600 font-medium">✓ 16 digit NIK lengkap</p>
+                  ) : null}
                 </div>
 
                 <div>
-                  <label htmlFor="nomorKK" className="block text-sm font-medium text-gray-700 mb-1.5">Nomor Kartu Keluarga</label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label htmlFor="nomorKK" className="block text-sm font-medium text-gray-700">Nomor Kartu Keluarga (KK)</label>
+                    <span className={`text-[11px] font-medium ${formData.nomorKK.length === 16 ? 'text-emerald-600' : 'text-gray-400'}`}>
+                      {formData.nomorKK.length}/16 digit
+                    </span>
+                  </div>
                   <input
                     id="nomorKK"
                     name="nomorKK"
                     type="text"
                     inputMode="numeric"
                     maxLength={16}
-                    placeholder="Masukkan nomor KK (16 digit)"
+                    placeholder="Masukkan 16 digit nomor KK"
                     value={formData.nomorKK}
                     onChange={handleNumericChange}
-                    className={`w-full h-[46px] px-4 rounded-lg border text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f] transition ${
-                      fieldErrors.nomorKK ? 'border-red-400 bg-red-50' : 'border-gray-300'
+                    className={`w-full h-11.5 px-4 rounded-lg border text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f] transition ${
+                      fieldErrors.nomorKK ? 'border-amber-400 bg-amber-50/40' : formData.nomorKK.length === 16 ? 'border-emerald-400' : 'border-gray-300'
                     }`}
                   />
-                  {fieldErrors.nomorKK && <p className="mt-1 text-xs text-red-600">{fieldErrors.nomorKK}</p>}
+                  {fieldErrors.nomorKK ? (
+                    <p className="mt-1 text-xs text-amber-700 font-medium">{fieldErrors.nomorKK}</p>
+                  ) : formData.nomorKK.length === 16 ? (
+                    <p className="mt-1 text-xs text-emerald-600 font-medium">✓ 16 digit Nomor KK lengkap</p>
+                  ) : null}
                 </div>
 
                 <div>
-                  <label htmlFor="nomorWhatsapp" className="block text-sm font-medium text-gray-700 mb-1.5">Nomor WhatsApp</label>
+                  <label htmlFor="nomorWhatsapp" className="block text-sm font-medium text-gray-700 mb-1.5">Nomor WhatsApp Aktif</label>
                   <input
                     id="nomorWhatsapp"
                     name="nomorWhatsapp"
                     type="tel"
                     inputMode="tel"
-                    placeholder="Masukkan nomor WhatsApp"
+                    placeholder="Contoh: 081234567890"
                     value={formData.nomorWhatsapp}
                     onChange={handleChange}
-                    className="w-full h-[46px] px-4 rounded-lg border border-gray-300 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f] transition"
+                    className="w-full h-11.5 px-4 rounded-lg border border-gray-300 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f] transition"
                   />
+                  <p className="mt-1 text-xs text-gray-400">Pemberitahuan status surat akan dikirimkan ke nomor ini.</p>
                 </div>
 
                 <div>
-                  <label htmlFor="alamat" className="block text-sm font-medium text-gray-700 mb-1.5">Alamat</label>
+                  <label htmlFor="alamat" className="block text-sm font-medium text-gray-700 mb-1.5">Alamat Tempat Tinggal</label>
                   <input
                     id="alamat"
                     name="alamat"
                     type="text"
-                    placeholder="Masukkan alamat"
+                    placeholder="Masukkan alamat lengkap (RT/RW, Dusun)"
                     value={formData.alamat}
                     onChange={handleChange}
-                    className="w-full h-[46px] px-4 rounded-lg border border-gray-300 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f] transition"
+                    className="w-full h-11.5 px-4 rounded-lg border border-gray-300 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f] transition"
                   />
                 </div>
               </div>
@@ -521,7 +620,7 @@ export default function SubmissionPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Jenis Surat</label>
                   {loadingCategories ? (
-                    <div className="h-[46px] rounded-lg border border-gray-200 bg-gray-50 flex items-center px-4">
+                    <div className="h-11.5 rounded-lg border border-gray-200 bg-gray-50 flex items-center px-4">
                       <Loader2 size={16} className="animate-spin text-gray-400" />
                     </div>
                   ) : (
@@ -530,51 +629,64 @@ export default function SubmissionPage() {
                       value={formData.categoryId}
                       onChange={handleCategoryChange}
                       options={categoryOptions}
-                      placeholder="Pilih jenis surat"
+                      placeholder="Pilih kategori jenis surat"
                     />
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Surat</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Surat yang Diajukan</label>
                   <CustomSelect
                     id="letterTypeId"
                     value={formData.letterTypeId}
                     onChange={handleLetterTypeChange}
                     options={letterTypeOptions}
-                    placeholder="Pilih surat"
+                    placeholder="Pilih nama surat"
                     disabled={!formData.categoryId || loadingCategories}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="keperluan" className="block text-sm font-medium text-gray-700 mb-1.5">Keperluan</label>
+                  <label htmlFor="keperluan" className="block text-sm font-medium text-gray-700 mb-1.5">Keperluan Pengajuan</label>
                   <input
                     id="keperluan"
                     name="keperluan"
                     type="text"
-                    placeholder="Masukkan keperluan"
+                    placeholder="Contoh: Persyaratan pendaftaran beasiswa / melamar pekerjaan"
                     value={formData.keperluan}
                     onChange={handleChange}
-                    className="w-full h-[46px] px-4 rounded-lg border border-gray-300 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f] transition"
+                    className="w-full h-11.5 px-4 rounded-lg border border-gray-300 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/20 focus:border-[#1a2e6f] transition"
                   />
                 </div>
               </div>
 
+              <h3 className="text-sm font-semibold text-gray-800 mb-4">Dokumen Persyaratan</h3>
               <div className="flex flex-col gap-6 mb-8">
                 <DocumentUploadZone
                   id="kkFile"
-                  label="Unggah Kartu Keluarga"
+                  label="Unggah Kartu Keluarga (KK)"
+                  documentName="Kartu Keluarga"
                   file={kkFile}
+                  error={fileErrors.kkFile}
                   onFileChange={handleKkFileChange}
-                  onRemove={() => setKkFile(null)}
+                  onRemove={() => {
+                    setKkFile(null);
+                    setFileErrors((prev) => ({ ...prev, kkFile: '' }));
+                    if (formError) setFormError('');
+                  }}
                 />
                 <DocumentUploadZone
                   id="ktpFile"
-                  label="Unggah KTP"
+                  label="Unggah KTP Pemohon"
+                  documentName="KTP"
                   file={ktpFile}
+                  error={fileErrors.ktpFile}
                   onFileChange={handleKtpFileChange}
-                  onRemove={() => setKtpFile(null)}
+                  onRemove={() => {
+                    setKtpFile(null);
+                    setFileErrors((prev) => ({ ...prev, ktpFile: '' }));
+                    if (formError) setFormError('');
+                  }}
                 />
               </div>
 
@@ -582,15 +694,15 @@ export default function SubmissionPage() {
                 <button
                   type="button"
                   onClick={() => router.back()}
-                  className="w-full sm:w-auto px-6 py-2.5 text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                  className="w-full sm:w-auto px-6 py-2.5 text-sm font-semibold text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition cursor-pointer"
                 >
                   Kembali
                 </button>
                 <button
                   type="submit"
-                  className="w-full sm:w-auto px-7 py-2.5 text-sm font-semibold text-white bg-[#1a2e6f] hover:bg-[#152460] rounded-lg transition"
+                  className="w-full sm:w-auto px-7 py-2.5 text-sm font-semibold text-white bg-[#1a2e6f] hover:bg-[#152460] rounded-lg transition cursor-pointer shadow-sm"
                 >
-                  Kirim
+                  Kirim Permohonan
                 </button>
               </div>
             </form>

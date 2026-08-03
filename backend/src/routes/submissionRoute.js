@@ -9,7 +9,7 @@ const router = Router();
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5 MB per file
+    fileSize: 2 * 1024 * 1024, // 2 MB per file (ensures 2 files stay safely under Vercel's 4.5 MB request payload limit)
   },
   fileFilter: (_req, file, cb) => {
     const allowed = ["image/jpeg", "image/png", "image/webp", "image/jpg", "application/pdf"];

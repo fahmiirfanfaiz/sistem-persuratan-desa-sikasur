@@ -22,7 +22,7 @@ export default function SubmissionSuccessPage() {
         />
         <div className="absolute inset-0 bg-[#0a0f2e]/65" />
 
-        <div className="relative z-10 max-w-[1140px] mx-auto px-6 w-full">
+        <div className="relative z-10 max-w-285 mx-auto px-6 w-full">
           <h1 className="text-2xl sm:text-3xl font-bold text-white">
             Pengajuan Permohonan Surat
           </h1>
@@ -34,7 +34,7 @@ export default function SubmissionSuccessPage() {
 
       {/* Success Card */}
       <main className="flex-1 py-14">
-        <div className="max-w-[640px] mx-auto px-4">
+        <div className="max-w-160 mx-auto px-4">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 px-8 py-10 flex flex-col items-center text-center">
             {/* Icon */}
             <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-5">
@@ -45,7 +45,7 @@ export default function SubmissionSuccessPage() {
             <h2 className="text-xl font-bold text-gray-900 mb-2">
               Pengajuan Permohonan Surat Berhasil Dikirim
             </h2>
-            <p className="text-sm text-gray-500 mb-7 leading-relaxed max-w-[420px]">
+            <p className="text-sm text-gray-500 mb-7 leading-relaxed max-w-105">
               Terima kasih, permohonan surat Anda telah berhasil masuk ke sistem
               admin desa.
             </p>

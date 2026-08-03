@@ -63,9 +63,9 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-40 w-full bg-white border-b border-gray-100 shadow-sm">
-        <div className="max-w-[1140px] mx-auto px-4 sm:px-6 h-[72px] flex items-center justify-between">
+        <div className="max-w-285 mx-auto px-4 sm:px-6 h-18 flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 shrink-0">
             <Image
               src="/images/logo-pemalang.svg"
               alt="Logo Pemalang"
@@ -74,7 +74,7 @@ export default function Navbar() {
               className="object-contain w-7 sm:w-8"
               priority
             />
-            <span className="hidden sm:block sm:text-[11px] text-[13px] font-bold text-[#1a2e6f] uppercase leading-tight max-w-[180px]">
+            <span className="hidden sm:block sm:text-[11px] text-[13px] font-bold text-[#1a2e6f] uppercase leading-tight max-w-45">
               Sistem Persuratan Digital
             </span>
           </Link>
@@ -113,7 +113,7 @@ export default function Navbar() {
               >
                 <Bell size={20} strokeWidth={1.75} />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1 shadow-sm ring-2 ring-white">
+                  <span className="absolute -top-0.5 -right-0.5 min-w-4.5 h-4.5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1 shadow-sm ring-2 ring-white">
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 )}
@@ -147,10 +147,10 @@ export default function Navbar() {
                   aria-haspopup="true"
                 >
                   {/* Avatar — initial-based */}
-                  <div className="w-8 h-8 rounded-full bg-[#1a2e6f] text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-[#1a2e6f] text-white flex items-center justify-center text-xs font-bold shrink-0">
                     {user.name?.charAt(0)?.toUpperCase() ?? "U"}
                   </div>
-                  <span className="text-sm font-medium text-gray-700 max-w-[120px] truncate hidden sm:block">
+                  <span className="text-sm font-medium text-gray-700 max-w-30 truncate hidden sm:block">
                     {user.name}
                   </span>
                   <ChevronDown
@@ -163,7 +163,7 @@ export default function Navbar() {
 
                 {/* Dropdown Menu — Figma 383-960 */}
                 {dropdownOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-[220px] rounded-2xl bg-white shadow-xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <div className="absolute right-0 top-full mt-2 w-55 rounded-2xl bg-white shadow-xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150">
                     {/* User info header */}
                     <div className="px-4 pt-4 pb-3 border-b border-gray-100">
                       <p className="text-sm font-semibold text-gray-900 truncate leading-tight">
@@ -182,7 +182,7 @@ export default function Navbar() {
                         onClick={() => setDropdownOpen(false)}
                       >
                         <span>Profil Pengguna</span>
-                        <User size={16} className="text-gray-400 flex-shrink-0" />
+                        <User size={16} className="text-gray-400 shrink-0" />
                       </Link>
                       <button
                         onClick={() => {
@@ -192,7 +192,7 @@ export default function Navbar() {
                         className="w-full flex items-center justify-between px-4 py-3 text-sm text-[#e53e3e] hover:bg-red-50 transition"
                       >
                         <span>Keluar</span>
-                        <LogOut size={16} className="flex-shrink-0" />
+                        <LogOut size={16} className="shrink-0" />
                       </button>
                     </div>
                   </div>

@@ -138,7 +138,7 @@ export default function PermohonanPage() {
 
       {/* Toolbar */}
       <div className="flex items-center gap-3 mb-4 flex-wrap">
-        <form onSubmit={handleSearch} className="flex-1 min-w-[200px] flex gap-2">
+        <form onSubmit={handleSearch} className="flex-1 min-w-50 flex gap-2">
           <div className="relative flex-1">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
@@ -178,7 +178,7 @@ export default function PermohonanPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm min-w-[640px]">
+            <table className="w-full text-sm min-w-160">
               <thead>
                 <tr className="border-b border-gray-100 text-left">
                   <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Nama Pemohon</th>

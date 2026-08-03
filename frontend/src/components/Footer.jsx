@@ -8,7 +8,7 @@ import { FaInstagram, FaYoutube } from "react-icons/fa";
 export default function Footer() {
   return (
     <footer className="bg-[#0d1b4b] text-gray-300">
-      <div className="max-w-[1140px] mx-auto px-6 py-14 grid grid-cols-1 sm:grid-cols-3 gap-10">
+      <div className="max-w-285 mx-auto px-6 py-14 grid grid-cols-1 sm:grid-cols-3 gap-10">
         {/* Logo + Jam Pelayanan */}
         <div className="flex flex-col gap-5">
           <Link href="/" className="flex items-center gap-3 w-fit">
@@ -19,7 +19,7 @@ export default function Footer() {
               height={43}
               className="object-contain"
             />
-            <span className="text-[11px] font-bold text-white uppercase leading-tight max-w-[200px]">
+            <span className="text-[11px] font-bold text-white uppercase leading-tight max-w-50">
               Sistem Persuratan Digital
             </span>
           </Link>

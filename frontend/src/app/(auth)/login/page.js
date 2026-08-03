@@ -73,10 +73,10 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#dde6f5] px-4 py-12">
-      <div className="w-full max-w-[478px] bg-white rounded-2xl shadow-lg px-10 py-10 flex flex-col items-center">
+      <div className="w-full max-w-119.5 bg-white rounded-2xl shadow-lg px-10 py-10 flex flex-col items-center">
         {/* Logo */}
         <div className="mb-5 flex flex-col items-center">
-          <div className="w-[55px] h-[74px] flex items-center justify-center">
+          <div className="w-13.75 h-18.5 flex items-center justify-center">
             <Image
               src="/images/logo-pemalang.svg"
               alt="Logo Kabupaten Pemalang"
@@ -98,7 +98,7 @@ function LoginForm() {
         {/* Registered Success Alert */}
         {justRegistered && (
           <div className="w-full mb-4 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700 flex items-center gap-2">
-            <CheckCircle2 size={16} className="flex-shrink-0" />
+            <CheckCircle2 size={16} className="shrink-0" />
             Registrasi berhasil! Silakan masuk dengan akun Anda.
           </div>
         )}
@@ -132,7 +132,7 @@ function LoginForm() {
                 placeholder="johndoe@gmail.com"
                 value={formData.email}
                 onChange={handleChange}
-                className="pl-10 py-3 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
+                className="pl-10 py-3 h-11.5 rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
                 required
                 disabled={isLoading}
               />
@@ -159,7 +159,7 @@ function LoginForm() {
                 placeholder="Minimal 8 karakter"
                 value={formData.password}
                 onChange={handleChange}
-                className="pl-10 pr-10 py-3 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
+                className="pl-10 pr-10 py-3 h-11.5 rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
                 required
                 disabled={isLoading}
               />
@@ -195,7 +195,7 @@ function LoginForm() {
             id="btn-masuk"
             type="submit"
             disabled={isLoading}
-            className="mt-2 w-full rounded-lg bg-[#1a2e6f] py-3 h-[46px] text-sm font-semibold text-white hover:bg-[#152460] active:bg-[#0f1a4d] transition-colors focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/40 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="mt-2 w-full rounded-lg bg-[#1a2e6f] py-3 h-11.5 text-sm font-semibold text-white hover:bg-[#152460] active:bg-[#0f1a4d] transition-colors focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/40 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isLoading && <Loader2 size={16} className="animate-spin" />}
             {isLoading ? "Masuk..." : "Masuk"}

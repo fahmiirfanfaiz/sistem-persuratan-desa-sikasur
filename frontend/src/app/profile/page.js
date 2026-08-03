@@ -27,7 +27,7 @@ import { getStoredUser, apiFetch } from "@/lib/api";
 function ProfileField({ icon: Icon, label, value, name, isEditing, onChange, type = "text", readOnly = false }) {
   return (
     <div className="flex items-start gap-4 py-4 border-b border-gray-50 last:border-0">
-      <div className="w-9 h-9 rounded-xl bg-[#1a2e6f]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+      <div className="w-9 h-9 rounded-xl bg-[#1a2e6f]/10 flex items-center justify-center shrink-0 mt-0.5">
         <Icon size={16} className="text-[#1a2e6f]" />
       </div>
       <div className="flex-1 min-w-0">
@@ -47,7 +47,7 @@ function ProfileField({ icon: Icon, label, value, name, isEditing, onChange, typ
         )}
       </div>
       {readOnly && isEditing && (
-        <span className="text-[10px] text-gray-300 bg-gray-100 rounded px-1.5 py-0.5 mt-1 flex-shrink-0">
+        <span className="text-[10px] text-gray-300 bg-gray-100 rounded px-1.5 py-0.5 mt-1 shrink-0">
           Terkunci
         </span>
       )}
@@ -161,7 +161,7 @@ export default function ProfilePage() {
     <div className="min-h-screen flex flex-col bg-[#f8f9fc]">
       <Navbar />
 
-      <main className="flex-1 max-w-[1140px] mx-auto w-full px-6 py-10">
+      <main className="flex-1 max-w-285 mx-auto w-full px-6 py-10">
         {/* Back button + Breadcrumb */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2 text-xs text-gray-400">
@@ -193,7 +193,7 @@ export default function ProfilePage() {
             <div className="lg:col-span-1">
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center text-center">
                 {/* Avatar */}
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#1a2e6f] to-[#2d4fbd] text-white flex items-center justify-center text-4xl font-bold shadow-lg mb-4">
+                <div className="w-24 h-24 rounded-full bg-linear-to-br from-[#1a2e6f] to-[#2d4fbd] text-white flex items-center justify-center text-4xl font-bold shadow-lg mb-4">
                   {initial}
                 </div>
                 <h2 className="text-base font-bold text-gray-900 mb-0.5">{profile?.name}</h2>

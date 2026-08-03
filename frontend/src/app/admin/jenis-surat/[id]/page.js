@@ -83,7 +83,7 @@ export default function DetailJenisSuratPage() {
       {/* Detail Card */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-4">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-[#1a2e6f]/10 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-[#1a2e6f]/10 flex items-center justify-center shrink-0">
             <FileText size={20} className="text-[#1a2e6f]" />
           </div>
           <div>

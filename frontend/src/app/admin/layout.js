@@ -94,7 +94,7 @@ export default function AdminLayout({ children }) {
 
       {/* ── Sidebar ── */}
       <aside
-        className={`fixed top-0 left-0 h-screen w-[242px] bg-white border-r border-gray-100 shadow-sm z-40 flex flex-col transition-transform duration-300 ${
+        className={`fixed top-0 left-0 h-screen w-60.5 bg-white border-r border-gray-100 shadow-sm z-40 flex flex-col transition-transform duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 lg:static lg:z-auto`}
       >
@@ -105,7 +105,7 @@ export default function AdminLayout({ children }) {
             alt="Logo"
             width={28}
             height={38}
-            className="object-contain flex-shrink-0"
+            className="object-contain shrink-0"
           />
           <span className="text-[11px] font-bold text-[#1a2e6f] uppercase leading-tight">
             Sistem Persuratan Digital
@@ -163,12 +163,12 @@ export default function AdminLayout({ children }) {
 
           {/* Breadcrumb */}
           <div className="flex-1 flex items-center gap-2 text-xs text-gray-400 min-w-0">
-            <Link href="/admin" className="hover:text-[#1a2e6f] transition flex-shrink-0">
+            <Link href="/admin" className="hover:text-[#1a2e6f] transition shrink-0">
               Beranda
             </Link>
             {pathname !== "/admin" && (
               <>
-                <span className="flex-shrink-0">›</span>
+                <span className="shrink-0">›</span>
                 <span className="text-gray-700 truncate">
                   {NAV_ITEMS.find((n) => pathname.startsWith(n.href) && !n.exact)
                     ?.label ?? "Detail"}
@@ -178,7 +178,7 @@ export default function AdminLayout({ children }) {
           </div>
 
           {/* Right: Notification, Website Link, Avatar */}
-          <div className="flex items-center gap-4 flex-shrink-0">
+          <div className="flex items-center gap-4 shrink-0">
             <Link
               href="/admin/notifications"
               className={`relative p-2 rounded-lg transition ${
@@ -190,7 +190,7 @@ export default function AdminLayout({ children }) {
             >
               <Bell size={18} />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1 shadow-sm ring-2 ring-white">
+                <span className="absolute -top-1 -right-1 min-w-4.5 h-4.5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center px-1 shadow-sm ring-2 ring-white">
                   {unreadCount > 99 ? "99+" : unreadCount}
                 </span>
               )}

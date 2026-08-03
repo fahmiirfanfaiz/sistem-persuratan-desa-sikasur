@@ -41,7 +41,7 @@ export default function LandingPage() {
 
       <main className="flex-1">
         {/* ── Hero Section ─────────────────────────────── */}
-        <section className="relative w-full min-h-[540px] flex items-center justify-center overflow-hidden">
+        <section className="relative w-full min-h-135 flex items-center justify-center overflow-hidden">
           {/* Background image */}
           <div className="absolute inset-0">
             <Image
@@ -76,12 +76,12 @@ export default function LandingPage() {
           </div>
 
           {/* Wave divider */}
-          <div className="absolute bottom-0 left-0 right-0 overflow-hidden leading-[0]">
+          <div className="absolute bottom-0 left-0 right-0 overflow-hidden leading-0">
             <svg
               viewBox="0 0 1440 80"
               xmlns="http://www.w3.org/2000/svg"
               preserveAspectRatio="none"
-              className="w-full h-[60px] sm:h-[80px]"
+              className="w-full h-15 sm:h-20"
             >
               <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#ffffff" />
             </svg>
@@ -90,12 +90,12 @@ export default function LandingPage() {
 
         {/* ── Persyaratan Pengajuan Surat ───────────────── */}
         <section className="bg-white py-20">
-          <div className="max-w-[1140px] mx-auto px-6">
+          <div className="max-w-285 mx-auto px-6">
             <div className="text-center mb-12">
               <h2 className="text-2xl font-bold text-gray-900">
                 Persyaratan Pengajuan Surat
               </h2>
-              <div className="mx-auto mt-3 h-[3px] w-20 rounded-full bg-[#1a2e6f]" />
+              <div className="mx-auto mt-3 h-0.75 w-20 rounded-full bg-[#1a2e6f]" />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
@@ -172,16 +172,16 @@ export default function LandingPage() {
 
         {/* ── Tutorial Pengajuan Surat ──────────────────── */}
         <section className="bg-[#f0f4fb] py-20">
-          <div className="max-w-[1140px] mx-auto px-6">
+          <div className="max-w-285 mx-auto px-6">
             <div className="text-center mb-12">
               <h2 className="text-2xl font-bold text-gray-900">
                 Tutorial Pengajuan Surat
               </h2>
-              <div className="mx-auto mt-3 h-[3px] w-20 rounded-full bg-[#1a2e6f]" />
+              <div className="mx-auto mt-3 h-0.75 w-20 rounded-full bg-[#1a2e6f]" />
             </div>
 
             {/* Video Placeholder */}
-            <div className="max-w-[860px] mx-auto">
+            <div className="max-w-215 mx-auto">
               <div className="relative rounded-2xl overflow-hidden shadow-xl bg-gray-800 aspect-video flex items-center justify-center group cursor-pointer">
                 <Image
                   src="/images/background-2.svg"
@@ -232,7 +232,7 @@ export default function LandingPage() {
 
       {/* ── Footer ───────────────────────────────────── */}
       <footer className="bg-[#0d1b4b] text-gray-300">
-        <div className="max-w-[1140px] mx-auto px-6 py-14 grid grid-cols-1 sm:grid-cols-3 gap-10">
+        <div className="max-w-285 mx-auto px-6 py-14 grid grid-cols-1 sm:grid-cols-3 gap-10">
           {/* Logo + Jam Pelayanan */}
           <div className="flex flex-col gap-5">
             <Link href="/" className="flex items-center gap-3 w-fit">
@@ -243,7 +243,7 @@ export default function LandingPage() {
                 height={43}
                 className="object-contain"
               />
-              <span className="text-[11px] font-bold text-white uppercase leading-tight max-w-[200px]">
+              <span className="text-[11px] font-bold text-white uppercase leading-tight max-w-50">
                 Sistem Persuratan Digital
               </span>
             </Link>

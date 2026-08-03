@@ -56,6 +56,29 @@ app.use("/api/submissions", submissionRoute);
 app.use("/api/users", userRoute);
 app.use("/api/admin", adminRoute);
 
+// Global error handling middleware (handles Multer errors, validation errors, etc.)
+app.use((err, _req, res, _next) => {
+  if (err && err.name === "MulterError") {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({
+        success: false,
+        message: "Ukuran file terlalu besar. Maksimal ukuran per dokumen adalah 2 MB.",
+      });
+    }
+    return res.status(400).json({
+      success: false,
+      message: `Kendala unggah dokumen: ${err.message}`,
+    });
+  }
+
+  if (err) {
+    return res.status(err.status || 400).json({
+      success: false,
+      message: err.message || "Terjadi kesalahan pada server.",
+    });
+  }
+});
+
 // Only bind to a port when running locally (not when imported by Vercel handler)
 if (process.env.VERCEL !== "1") {
   const port = process.env.PORT || 5000;

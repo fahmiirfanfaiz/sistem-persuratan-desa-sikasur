@@ -61,7 +61,7 @@ function PreviewModal({ isOpen, onClose, url, title, isPdf }) {
             <X size={18} />
           </button>
         </div>
-        <div className="flex-1 overflow-auto bg-gray-50 min-h-[400px] flex items-center justify-center">
+        <div className="flex-1 overflow-auto bg-gray-50 min-h-100 flex items-center justify-center">
           {isDocx ? (
             <div className="flex flex-col items-center p-8 text-center">
               <FileText size={48} className="text-gray-400 mb-4" />
@@ -69,7 +69,7 @@ function PreviewModal({ isOpen, onClose, url, title, isPdf }) {
               <p className="text-xs text-gray-500 mt-1">Silakan unduh file untuk melihatnya.</p>
             </div>
           ) : isPdf ? (
-            <iframe src={url} title={title} className="w-full h-full min-h-[500px]" style={{ border: 'none' }} />
+            <iframe src={url} title={title} className="w-full h-full min-h-125" style={{ border: 'none' }} />
           ) : (
             <img src={url} alt={title} className="max-w-full max-h-[70vh] object-contain rounded-lg" />
           )}
@@ -265,7 +265,7 @@ export default function EditPermohonanPage() {
         </div>
 
         <div className="mt-4 pt-4 border-t border-gray-100 flex items-center gap-3">
-          <FileText size={15} className="text-[#1a2e6f] flex-shrink-0" />
+          <FileText size={15} className="text-[#1a2e6f] shrink-0" />
           <span className="text-sm text-gray-600">
             <span className="font-medium">Jenis Surat:</span> {submission.letterType?.name}
           </span>
@@ -320,10 +320,10 @@ export default function EditPermohonanPage() {
                 className="flex items-center justify-between bg-gray-50 rounded-xl border border-gray-200 px-4 py-3"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-6 h-6 rounded-md bg-gray-200 flex items-center justify-center flex-shrink-0 text-xs font-bold text-gray-500">
+                  <div className="w-6 h-6 rounded-md bg-gray-200 flex items-center justify-center shrink-0 text-xs font-bold text-gray-500">
                     {idx + 1}
                   </div>
-                  <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center shrink-0">
                     {isDocPdf ? <FileText size={14} className="text-red-400" /> : <FileImage size={14} className="text-[#1a2e6f]" />}
                   </div>
                   <div>
@@ -353,10 +353,10 @@ export default function EditPermohonanPage() {
           {submission.letterType?.templatePath && (
             <div className="flex items-center justify-between bg-blue-50 rounded-xl border border-blue-200 px-4 py-3 mt-2">
               <div className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-md bg-gray-200 flex items-center justify-center flex-shrink-0 text-xs font-bold text-gray-500">
+                <div className="w-6 h-6 rounded-md bg-gray-200 flex items-center justify-center shrink-0 text-xs font-bold text-gray-500">
                   {(submission.documents?.length || 0) + 1}
                 </div>
-                <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
                   <FileText size={14} className="text-blue-500" />
                 </div>
                 <div>
@@ -393,7 +393,7 @@ export default function EditPermohonanPage() {
                 : "bg-red-50 border border-red-200 text-red-700"
             }`}
           >
-            {saveMsg.type === "success" ? <CheckCircle2 size={16} className="mt-0.5 flex-shrink-0" /> : <AlertCircle size={16} className="mt-0.5 flex-shrink-0" />}
+            {saveMsg.type === "success" ? <CheckCircle2 size={16} className="mt-0.5 shrink-0" /> : <AlertCircle size={16} className="mt-0.5 shrink-0" />}
             {saveMsg.text}
           </div>
         )}

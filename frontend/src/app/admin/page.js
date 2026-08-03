@@ -190,7 +190,7 @@ export default function AdminBerandaPage() {
 
         {/* Bar Chart */}
         {loading ? (
-          <div className="h-[260px] flex items-center justify-center">
+          <div className="h-65 flex items-center justify-center">
             <div className="w-8 h-8 border-2 border-[#1a2e6f] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (

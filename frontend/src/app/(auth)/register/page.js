@@ -112,10 +112,10 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#dde6f5] px-4 py-12">
-      <div className="w-full max-w-[478px] bg-white rounded-2xl shadow-lg px-10 py-10 flex flex-col items-center">
+      <div className="w-full max-w-119.5 bg-white rounded-2xl shadow-lg px-10 py-10 flex flex-col items-center">
         {/* Logo */}
         <div className="mb-5 flex flex-col items-center">
-          <div className="w-[55px] h-[74px] flex items-center justify-center">
+          <div className="w-13.75 h-18.5 flex items-center justify-center">
             <Image
               src="/images/logo-pemalang.svg"
               alt="Logo Kabupaten Pemalang"
@@ -160,7 +160,7 @@ export default function RegisterPage() {
                 placeholder="John Doe"
                 value={formData.namaLengkap}
                 onChange={handleChange}
-                className="pl-10 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
+                className="pl-10 h-11.5 rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
                 required
                 disabled={isLoading}
               />
@@ -188,7 +188,7 @@ export default function RegisterPage() {
                 placeholder="3301010101010001"
                 value={formData.nik}
                 onChange={handleNumericChange}
-                className="pl-10 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
+                className="pl-10 h-11.5 rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
                 required
                 disabled={isLoading}
               />
@@ -216,7 +216,7 @@ export default function RegisterPage() {
                 placeholder="3301011203456789"
                 value={formData.nomorKK}
                 onChange={handleNumericChange}
-                className="pl-10 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
+                className="pl-10 h-11.5 rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
                 required
                 disabled={isLoading}
               />
@@ -243,7 +243,7 @@ export default function RegisterPage() {
                 placeholder="johndoe@gmail.com"
                 value={formData.email}
                 onChange={handleChange}
-                className="pl-10 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
+                className="pl-10 h-11.5 rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
                 required
                 disabled={isLoading}
               />
@@ -271,7 +271,7 @@ export default function RegisterPage() {
                 placeholder="082328775373"
                 value={formData.nomorHandphone}
                 onChange={handleNumericChange}
-                className="pl-10 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
+                className="pl-10 h-11.5 rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
                 required
                 disabled={isLoading}
               />
@@ -298,7 +298,7 @@ export default function RegisterPage() {
                 placeholder="Sikasur, Kec. Belik, Kabupaten Pemalang, Jawa..."
                 value={formData.alamat}
                 onChange={handleChange}
-                className="pl-10 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
+                className="pl-10 h-11.5 rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
                 required
                 disabled={isLoading}
               />
@@ -325,7 +325,7 @@ export default function RegisterPage() {
                 placeholder="Minimal 8 karakter"
                 value={formData.password}
                 onChange={handleChange}
-                className="pl-10 pr-10 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
+                className="pl-10 pr-10 h-11.5 rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
                 required
                 minLength={8}
                 disabled={isLoading}
@@ -368,7 +368,7 @@ export default function RegisterPage() {
                 placeholder="Ulangi password"
                 value={formData.konfirmasiPassword}
                 onChange={handleChange}
-                className="pl-10 pr-10 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
+                className="pl-10 pr-10 h-11.5 rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
                 required
                 minLength={8}
                 disabled={isLoading}
@@ -398,7 +398,7 @@ export default function RegisterPage() {
             id="btn-daftar"
             type="submit"
             disabled={isLoading}
-            className="mt-2 w-full rounded-lg bg-[#1a2e6f] py-3 h-[46px] text-sm font-semibold text-white hover:bg-[#152460] active:bg-[#0f1a4d] transition-colors focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/40 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="mt-2 w-full rounded-lg bg-[#1a2e6f] py-3 h-11.5 text-sm font-semibold text-white hover:bg-[#152460] active:bg-[#0f1a4d] transition-colors focus:outline-none focus:ring-2 focus:ring-[#1a2e6f]/40 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isLoading && <Loader2 size={16} className="animate-spin" />}
             {isLoading ? "Mendaftar..." : "Daftar"}

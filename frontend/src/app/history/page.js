@@ -89,7 +89,7 @@ function SubmissionCard({ submission }) {
       <div className="flex items-center justify-between gap-3 sm:gap-4">
         {/* Icon + Info */}
         <div className="flex items-center sm:items-start gap-3 sm:gap-4 min-w-0">
-          <div className="w-10 h-10 rounded-xl bg-[#1a2e6f]/10 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-[#1a2e6f]/10 flex items-center justify-center shrink-0">
             <FileText size={18} className="text-[#1a2e6f]" />
           </div>
           <div className="min-w-0">
@@ -107,7 +107,7 @@ function SubmissionCard({ submission }) {
         </div>
 
         {/* Status + Chevron */}
-        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <StatusBadge status={submission.status} />
           <ChevronRight size={16} className="text-gray-300 group-hover:text-[#1a2e6f] transition-colors" />
         </div>
@@ -200,7 +200,7 @@ export default function HistoryPage() {
     <div className="min-h-screen flex flex-col bg-[#f8f9fc]">
       <Navbar />
 
-      <main className="flex-1 max-w-[1140px] mx-auto w-full px-4 sm:px-6 py-8 sm:py-10">
+      <main className="flex-1 max-w-285 mx-auto w-full px-4 sm:px-6 py-8 sm:py-10">
         {/* Page Header */}
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center justify-between mb-3">

@@ -137,7 +137,7 @@ export default function PenggunaPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm min-w-[700px]">
+            <table className="w-full text-sm min-w-175">
               <thead>
                 <tr className="border-b border-gray-100 text-left">
                   <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Nama</th>
@@ -155,13 +155,13 @@ export default function PenggunaPage() {
                   <tr key={u.id} className={`border-b border-gray-50 hover:bg-gray-50/60 transition ${i % 2 === 0 ? "" : "bg-gray-50/30"}`}>
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-2">
-                        <div className="w-7 h-7 rounded-full bg-[#1a2e6f] text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
+                        <div className="w-7 h-7 rounded-full bg-[#1a2e6f] text-white text-xs font-bold flex items-center justify-center shrink-0">
                           {u.name?.charAt(0)?.toUpperCase()}
                         </div>
-                        <span className="font-medium text-gray-800 truncate max-w-[120px]">{u.name}</span>
+                        <span className="font-medium text-gray-800 truncate max-w-30">{u.name}</span>
                       </div>
                     </td>
-                    <td className="px-5 py-3.5 text-gray-500 truncate max-w-[160px]">{u.email}</td>
+                    <td className="px-5 py-3.5 text-gray-500 truncate max-w-40">{u.email}</td>
                     <td className="px-5 py-3.5 text-gray-500">{u.phoneNumber}</td>
                     <td className="px-5 py-3.5">
                       <span className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full border ${u.role === "ADMIN" ? "bg-purple-50 text-purple-600 border-purple-200" : "bg-gray-50 text-gray-600 border-gray-200"}`}>

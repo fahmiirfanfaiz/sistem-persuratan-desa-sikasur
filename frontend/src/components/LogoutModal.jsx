@@ -16,7 +16,7 @@ export default function LogoutModal({ isOpen, onClose, onConfirm }) {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-[440px] mx-4 p-6"
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-110 mx-4 p-6"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

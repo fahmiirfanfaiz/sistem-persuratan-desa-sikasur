@@ -84,7 +84,7 @@ function ResetPasswordContent() {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-[#1a2e6f]/5 blur-3xl" />
       </div>
 
-      <div className="relative z-10 w-full max-w-[440px] bg-white rounded-3xl shadow-xl border border-gray-100 p-8 sm:p-10">
+      <div className="relative z-10 w-full max-w-110 bg-white rounded-3xl shadow-xl border border-gray-100 p-8 sm:p-10">
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <Image
@@ -150,7 +150,7 @@ function ResetPasswordContent() {
                   placeholder="Minimal 8 karakter"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 pr-10 py-3 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
+                  className="pl-10 pr-10 py-3 h-11.5 rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
                   required
                   disabled={isLoading}
                 />
@@ -188,7 +188,7 @@ function ResetPasswordContent() {
                   placeholder="Masukkan ulang password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="pl-10 pr-10 py-3 h-[46px] rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
+                  className="pl-10 pr-10 py-3 h-11.5 rounded-lg border-gray-300 text-gray-700 placeholder:text-gray-400 focus-visible:border-[#1a2e6f] focus-visible:ring-[#1a2e6f]/20"
                   required
                   disabled={isLoading}
                 />
@@ -211,7 +211,7 @@ function ResetPasswordContent() {
             <Button
               type="submit"
               disabled={isLoading || !token}
-              className="w-full h-[46px] mt-2 rounded-lg bg-[#1a2e6f] hover:bg-[#152460] text-white font-semibold transition flex justify-center items-center gap-2"
+              className="w-full h-11.5 mt-2 rounded-lg bg-[#1a2e6f] hover:bg-[#152460] text-white font-semibold transition flex justify-center items-center gap-2"
             >
               {isLoading ? (
                 <>

@@ -20,7 +20,7 @@ export default function SubmissionConfirmModal({
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl w-full max-w-[420px] mx-4 p-6"
+        className="bg-white rounded-2xl shadow-xl w-full max-w-105 mx-4 p-6"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

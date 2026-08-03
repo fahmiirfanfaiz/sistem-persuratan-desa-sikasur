@@ -55,12 +55,12 @@ function StatusBadge({ status }) {
 function InfoRow({ icon: Icon, label, value }) {
   return (
     <div className="flex items-start gap-3">
-      <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center flex-shrink-0 mt-0.5">
+      <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center shrink-0 mt-0.5">
         <Icon size={15} className="text-gray-400" />
       </div>
       <div className="min-w-0">
         <p className="text-xs text-gray-400 mb-0.5">{label}</p>
-        <p className="text-sm font-medium text-gray-800 break-words">{value || '-'}</p>
+        <p className="text-sm font-medium text-gray-800 wrap-break-word">{value || '-'}</p>
       </div>
     </div>
   );
@@ -98,7 +98,7 @@ function PreviewModal({ isOpen, onClose, url, title, isPdf }) {
             <X size={18} />
           </button>
         </div>
-        <div className="flex-1 overflow-auto bg-gray-50 min-h-[400px] flex items-center justify-center">
+        <div className="flex-1 overflow-auto bg-gray-50 min-h-100 flex items-center justify-center">
           {isDocx ? (
             <div className="flex flex-col items-center p-8 text-center">
               <FileText size={48} className="text-gray-400 mb-4" />
@@ -106,7 +106,7 @@ function PreviewModal({ isOpen, onClose, url, title, isPdf }) {
               <p className="text-xs text-gray-500 mt-1">Silakan unduh file untuk melihatnya.</p>
             </div>
           ) : isPdf ? (
-            <iframe src={url} title={title} className="w-full h-full min-h-[500px]" style={{ border: 'none' }} />
+            <iframe src={url} title={title} className="w-full h-full min-h-125" style={{ border: 'none' }} />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={url} alt={title} className="max-w-full max-h-[70vh] object-contain rounded-lg" />
@@ -165,7 +165,7 @@ function DocumentRow({ submissionId, doc }) {
     <>
       <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-lg bg-white border border-gray-200 flex items-center justify-center flex-shrink-0 shadow-sm">
+          <div className="w-9 h-9 rounded-lg bg-white border border-gray-200 flex items-center justify-center shrink-0 shadow-sm">
             {isPdf ? <FileText size={16} className="text-red-500" /> : <FileImage size={16} className="text-[#1a2e6f]" />}
           </div>
           <div>
@@ -173,7 +173,7 @@ function DocumentRow({ submissionId, doc }) {
             <p className="text-xs text-gray-400">{formatDate(doc.createdAt)}</p>
           </div>
         </div>
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           {error && <p className="text-xs text-red-500 mb-1">{error}</p>}
           <button
             onClick={handlePreview}
@@ -242,7 +242,7 @@ function GeneratedLetterRow({ submissionId, letter }) {
     <>
       <div className="flex items-center justify-between p-4 bg-violet-50 rounded-xl gap-3 border border-violet-100">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-lg bg-white border border-violet-200 flex items-center justify-center flex-shrink-0 shadow-sm">
+          <div className="w-9 h-9 rounded-lg bg-white border border-violet-200 flex items-center justify-center shrink-0 shadow-sm">
             <FileCheck size={16} className="text-violet-600" />
           </div>
           <div>
@@ -256,7 +256,7 @@ function GeneratedLetterRow({ submissionId, letter }) {
             {letter.letterNumber && <p className="text-xs text-gray-500 mt-0.5">No: {letter.letterNumber}</p>}
           </div>
         </div>
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           {error && <p className="text-xs text-red-500 mb-1">{error}</p>}
           <div className="flex gap-2">
             <button
@@ -349,7 +349,7 @@ export default function DetailPermohonanPage() {
             ID: <span className="font-mono text-xs bg-gray-100 px-2 py-0.5 rounded">{submission.id}</span>
           </p>
         </div>
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="flex items-center gap-3 shrink-0">
           <StatusBadge status={submission.status} />
           <Link
             href={`/admin/permohonan/${id}/edit`}
@@ -413,7 +413,7 @@ export default function DetailPermohonanPage() {
           <SectionCard title="Data Pemohon" icon={User}>
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
-                <div className="w-12 h-12 rounded-full bg-[#1a2e6f] text-white text-lg font-bold flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 rounded-full bg-[#1a2e6f] text-white text-lg font-bold flex items-center justify-center shrink-0">
                   {submission.user?.name?.charAt(0)?.toUpperCase() ?? '?'}
                 </div>
                 <div>

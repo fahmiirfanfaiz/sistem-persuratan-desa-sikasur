@@ -81,7 +81,7 @@ function NotifCard({ notif, isRead, onRead }) {
 
       <div className="flex items-start gap-4">
         {/* Icon */}
-        <div className={`w-10 h-10 rounded-xl ${cfg.bgClass} flex items-center justify-center flex-shrink-0`}>
+        <div className={`w-10 h-10 rounded-xl ${cfg.bgClass} flex items-center justify-center shrink-0`}>
           <Icon size={18} className={cfg.iconClass} />
         </div>
 
@@ -91,7 +91,7 @@ function NotifCard({ notif, isRead, onRead }) {
             <p className={`text-sm font-semibold ${isRead ? "text-gray-700" : "text-gray-900"}`}>
               {notif.header}
             </p>
-            <span className="text-[11px] text-gray-400 flex-shrink-0 mt-0.5">
+            <span className="text-[11px] text-gray-400 shrink-0 mt-0.5">
               {relativeTime(notif.createdAt)}
             </span>
           </div>
